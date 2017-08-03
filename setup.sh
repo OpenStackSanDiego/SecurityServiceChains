@@ -15,23 +15,22 @@ time packstack                                  \
 yum -y update
 yum install -y python-networking-sfc
 
-## setup networking
-IFCFG_BOND0=/etc/sysconfig/network-scripts/ifcfg-bond0
-IFCFG_BR_EX=/etc/sysconfig/network-scripts/ifcfg-br-ex
-
+## setup physical networking
 # setup a new network config with the IP address from bond0
 cp $IFCFG_BOND0 $IFCFG_BR_EX
-sed -i '/^DEVICE=bond0\/ s/$/DEVICE=br-ex' $IFCFG_BR_EX
-sed -i '/^NAME=bond0\/ s/$/NAME=br-ex' $IFCFG_BR_EX
+sed -i 's/^DEVICE=bond0/DEVICE=br-ex/' $IFCFG_BR_EX
+sed -i 's/^NAME=bond0/NAME=br-ex/' $IFCFG_BR_EX
 
-# remove the IP from bond0
-sed -i '/^IPADDR=\/ s/$/#IPADDR=' $IFCFG_BOND0
+# remove the IP address from bond0 by commenting it out
+sed -i '/^IPADDR=/ s/^#*/#/' $IFCFG_BOND0
 
 # change the default gateway from bond0 to br-ex
-sed -i '/^GATEWAYDEV=\*/ s/$/br-ex/' /etc/sysconfig/network
+sed -i 's/^GATEWAYDEV=.*/GATEWAYDEV=br-ex/' /etc/sysconfig/network
 
 # add the physical port to the bridge
 ovs-vsctl add-port br-ex bond0
+
+## end of physical networking
 
 
 
