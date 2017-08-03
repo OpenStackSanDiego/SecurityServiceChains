@@ -13,28 +13,18 @@ time packstack                                  \
         --os-heat-install=y
 
 yum -y update
+
+# fix for https://bugs.launchpad.net/horizon/+bug/1671084 (heat topology tab not present in horizon)
+sed -i 's/resources:index/resource:index/g' /usr/share/openstack-dashboard/openstack_dashboard/dashboards/project/stacks/tabs.py
+
+## end of base OpenStack cloud install
+
+
+
+## install and configure networing-sfc
+
 yum install -y python-networking-sfc
 
-## setup physical networking
-# setup a new network config with the IP address from bond0
-cp $IFCFG_BOND0 $IFCFG_BR_EX
-sed -i 's/^DEVICE=bond0/DEVICE=br-ex/' $IFCFG_BR_EX
-sed -i 's/^NAME=bond0/NAME=br-ex/' $IFCFG_BR_EX
-
-# remove the IP address from bond0 by commenting it out
-sed -i '/^IPADDR=/ s/^#*/#/' $IFCFG_BOND0
-
-# change the default gateway from bond0 to br-ex
-sed -i 's/^GATEWAYDEV=.*/GATEWAYDEV=br-ex/' /etc/sysconfig/network
-
-# add the physical port to the bridge
-ovs-vsctl add-port br-ex bond0
-
-## end of physical networking
-
-
-
-## setup network-sfc
 NEUTRON_CONF=/etc/neutron/neutron.conf
 
 # enable the service plugin (controller nodes)
@@ -62,14 +52,11 @@ EOF
 # database setup
 neutron-db-manage --subproject networking-sfc upgrade head
 
+## end of install and configure networking-sfc
 
 
-# fix for https://bugs.launchpad.net/horizon/+bug/1671084 (heat topology tab not present in horizon)
-sed -i 's/resources:index/resource:index/g' /usr/share/openstack-dashboard/openstack_dashboard/dashboards/project/stacks/tabs.py
 
-# end of OpenStack cloud install
-
-# OpenStack cloud configuration starts here...
+## start of cloud customization
 
 . ~/keystonerc_admin
 
@@ -127,9 +114,28 @@ glance  --os-image-api-version 2 image-create --protected True --name $IMG_NAME 
         --visibility public --disk-format raw --container-format bare --property os_distro=$OS_DISTRO --progress  
 	
 
-GATEWAY=`ip route list | egrep "^default" | cut -d' ' -f 3`
-IP=`hostname -I | cut -d' ' -f 1`
-SUBNET=`ip -4 -o addr show dev bond0 | grep $IP | cut -d ' ' -f 7`
+## end of cloud customization
+	
+	
+	
+
+## setup physical networking
+# setup a new network config with the IP address from bond0
+cp $IFCFG_BOND0 $IFCFG_BR_EX
+sed -i 's/^DEVICE=bond0/DEVICE=br-ex/' $IFCFG_BR_EX
+sed -i 's/^NAME=bond0/NAME=br-ex/' $IFCFG_BR_EX
+
+# remove the IP address from bond0 by commenting it out
+sed -i '/^IPADDR=/ s/^#*/#/' $IFCFG_BOND0
+
+# change the default gateway device from bond0 to br-ex
+sed -i 's/^GATEWAYDEV=.*/GATEWAYDEV=br-ex/' /etc/sysconfig/network
+
+# add the physical port to the bridge
+ovs-vsctl add-port br-ex bond0
+
+## end of physical networking
+
 
 sync
 sleep 1
