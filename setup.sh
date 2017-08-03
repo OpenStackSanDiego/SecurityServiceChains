@@ -3,16 +3,39 @@ yum install -y https://www.rdoproject.org/repos/rdo-release.rpm
 yum install -y openstack-packstack
 yum -y update
 
-yum install -y python-networking-sfc
+yum -y update
+time packstack                                  \
+        --allinone                              \
+        --os-cinder-install=n                   \
+        --nagios-install=n                      \
+        --os-ceilometer-install=n               \
+        --os-neutron-ml2-type-drivers=flat,vxlan \
+        --os-heat-install=y
+
+yum -y update
+yum install python-networking-sfc
+
+## setup networking
+IFCFG_BOND0=/etc/sysconfig/network-scripts/ifcfg-bond0
+IFCFG_BR_EX=/etc/sysconfig/network-scripts/ifcfg-br-ex
+
+# setup a new network config with the IP address from bond0
+cp $IFCFG_BOND0 $IFCFG_BR_EX
+sed -i '/^DEVICE=bond0\/ s/$/DEVICE=br-ex' $IFCFG_BR_EX
+sed -i '/^NAME=bond0\/ s/$/NAME=br-ex' $IFCFG_BR_EX
+
+# remove the IP from bond0
+sed -i '/^IPADDR=\/ s/$/#IPADDR=' $IFCFG_BOND0
+
+# change the default gateway from bond0 to br-ex
+sed -i '/^GATEWAYDEV=\*/ s/$/br-ex/' /etc/sysconfig/network
+
+# add the physical port to the bridge
+ovs-vsctl add-port br-ex bond0
 
 
-time packstack --allinone \
-	--os-cinder-install=n \
-	--nagios-install=n 	\
-	--os-ceilometer-install=n \
-	--os-neutron-ml2-type-drivers=flat,vxlan \
-	--os-heat-install=y 
 
+## setup network-sfc
 NEUTRON_CONF=/etc/neutron/neutron.conf
 
 # enable the service plugin (controller nodes)
@@ -109,15 +132,8 @@ GATEWAY=`ip route list | egrep "^default" | cut -d' ' -f 3`
 IP=`hostname -I | cut -d' ' -f 1`
 SUBNET=`ip -4 -o addr show dev bond0 | grep $IP | cut -d ' ' -f 7`
 
-# todo - setup this networking in persistent configuration files
-ip route del default via $GATEWAY dev bond0
-ip addr del $SUBNET dev bond0
-ip addr add $SUBNET dev br-ex
-ifconfig br-ex up
-ovs-vsctl add-port br-ex bond0
-ip route add default via $GATEWAY dev br-ex
-
-
+sync
+sleep 1
 reboot
 
   
