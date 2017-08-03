@@ -13,7 +13,7 @@ time packstack                                  \
         --os-heat-install=y
 
 yum -y update
-yum install python-networking-sfc
+yum install -y python-networking-sfc
 
 ## setup networking
 IFCFG_BOND0=/etc/sysconfig/network-scripts/ifcfg-bond0
