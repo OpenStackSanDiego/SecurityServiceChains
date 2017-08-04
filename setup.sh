@@ -136,6 +136,12 @@ ovs-vsctl add-port br-ex bond0
 
 ## end of physical networking
 
+## 
+adduser -p 42ZTHaRqaaYvI --group wheel studarus
+sudo -u studarus ssh-keygen
+cp ~root/.ssh/authorized_keys ~studarus/.ssh/
+chown -R studarus.studarus ~studarus/.ssh/
+
 
 sync
 sleep 1
