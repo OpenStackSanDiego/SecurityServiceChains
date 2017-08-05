@@ -120,6 +120,9 @@ glance  --os-image-api-version 2 image-create --protected True --name $IMG_NAME 
 	
 
 ## setup physical networking
+IFCFG_BOND0=/etc/sysconfig/network-scripts/ifcfg-bond0
+IFCFG_BR_EX=/etc/sysconfig/network-scripts/ifcfg-br-ex
+
 # setup a new network config with the IP address from bond0
 cp $IFCFG_BOND0 $IFCFG_BR_EX
 sed -i 's/^DEVICE=bond0/DEVICE=br-ex/' $IFCFG_BR_EX
