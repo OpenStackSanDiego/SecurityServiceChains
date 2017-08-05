@@ -60,15 +60,15 @@ neutron-db-manage --subproject networking-sfc upgrade head
 
 . ~/keystonerc_admin
 
-# delete the demo public subnet
-OLD_SUBNET_ID=`openstack subnet show public_subnet -f value -c id`
+# disconnect the demo router from the existing external public network
 ROUTER_ID=`openstack router show router1 -c id -f value`
-# is there an openstack cli replacement for router gateway clear?
-neutron router-gateway-clear $ROUTER_ID
+openstack router unset --external-gateway $ROUTER_ID
+
+# delete the demo subnet from the public network
+OLD_SUBNET_ID=`openstack subnet show public_subnet -f value -c id`
 openstack subnet delete $OLD_SUBNET_ID
 
-# add the new public subnet
-
+# add the new public subnet associated with the physical IP addresses assigned
 IP=`hostname -I | cut -d' ' -f 1`
 SUBNET=`ip -4 -o addr show dev bond0 | grep $IP | cut -d ' ' -f 7`
 DNS_NAMESERVER=`grep -i nameserver /etc/resolv.conf | head -n1 | cut -d ' ' -f2`
@@ -78,24 +78,6 @@ openstack subnet create                         \
         --dns-nameserver $DNS_NAMESERVER        \
         --subnet-range $SUBNET                  \
         $SUBNET
-
-SUBNET_ID=`openstack subnet show $SUBNET -c id -f value`
-neutron router-gateway-set router1 public
-
-# create an internal network
-INTERNAL_SUBNET=192.168.10.0/24
-
-openstack network create internal
-
-openstack subnet create                         \
-        --network internal                      \
-        --dns-nameserver $DNS_NAMESERVER        \
-        --subnet-range $INTERNAL_SUBNET         \
-        $INTERNAL_SUBNET
-
-ROUTER_ID=`openstack router show router1 -c id -f value`
-INTERNAL_SUBNET_ID=`openstack subnet show $INTERNAL_SUBNET -c id -f value`
-openstack router add subnet $ROUTER_ID $INTERNAL_SUBNET_ID
 
 
 # install some OS images
