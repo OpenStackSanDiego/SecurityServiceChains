@@ -16,10 +16,10 @@
 
 ## Networking Setup
   * Setup network security groups to allow SSH and HTTP to the project from your laptop external network
-``
+```bash
 openstack security group rule create --dst-port 80 --protocol tcp --ingress default
 openstack security group rule create --dst-port 22 --protocol tcp --ingress default
-``
+```
   
 ## Image login info
   * admin/openstack for the CirrosWeb image
@@ -53,7 +53,7 @@ $ sudo su -
 ```
 * Startup the web server via the command "hostname-webserver.sh"
 ```bash
-# ./hostname-webserver.sh &
+# ./hostname-webserver.sh
 ```
 
 ## Initial web-server Test
@@ -87,40 +87,40 @@ Next we'll introduce a virtual machine with some network monitoring tools instal
 * Log into the physical OpenStack controller via SSH (IP address provided on the lab handout). The OpenStack credentials (keystonerc) will be loaded automatically when you login.
 
 * Record the assigned port (ID) for the WebClient. We'll need this to create the service chain.
-`` bash
+```bash
 openstack port list --server WebClient
-``
+```
 
 * Create the Flow Classifier
-`` bash
+```bash
 neutron flow-classifier-create \
   --description "HTTP traffic from WebClient" \
   --logical-source-port f9d265a7-90e2-41e1-8cf6-0d142e153d0b \
   --ethertype IPv4 \
   --protocol tcp \
   --destination-port 80:80 WebClientOutboundFlowClassifier
-``
+```
 
 * Create the Port Pair
-``bash
+```bash
 neutron port-pair-create \
   --description "NetMon" \
   --ingress p1 \
   --egress p2 PP1
-``
+```
 
 * Create the Port Pair Group
-``bash
+```bash
 neutron port-pair-group-create \
   --port-pair PP1 PPG1
-``
+```
 
 * Create the Port Chain
-``bash
+```bash
 neutron port-chain-create \
   --port-pair-group PPG1 \
   --flow-classifier WebClientOutboundFlowClassifier PC1
-``
+```
 
 
 
