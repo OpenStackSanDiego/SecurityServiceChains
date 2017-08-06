@@ -3,17 +3,18 @@ do
 
 PROJECT=project$i
 USER=user$i
+USER_HOME=`eval echo "~$USER"`
 
-echo $PROJECT $USER
+echo $PROJECT $USER $USER_HOME
 
 # userXX/openstack
 adduser -p 42ZTHaRqaaYvI $USER
-cp -R ~root/.ssh ~$USER/
-chown -R $USER.$USER ~$USER/.ssh/
+cp -R ~root/.ssh ~$USER_HOME
+chown -R $USER.$USER ~$USER_HOME/.ssh/
 
 IP=`hostname -I | cut -d' ' -f 1`
 
-cat >> ~$USER/keystonerc << EOF
+cat >> ~$USER_HOME/keystonerc << EOF
 unset OS_SERVICE_TOKEN
 export OS_USERNAME=$USER
 export OS_PASSWORD=openstack
