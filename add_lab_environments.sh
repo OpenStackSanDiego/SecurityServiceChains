@@ -6,6 +6,27 @@ USER=user$i
 
 echo $PROJECT $USER
 
+# userXX/openstack
+adduser -p 42ZTHaRqaaYvI $USER
+cp -R ~root/.ssh ~$USER/
+chown -R $USER.$USER ~$USER/.ssh/
+
+IP=`hostname -I | cut -d' ' -f 1`
+
+cat >> ~$USER/keystonerc << EOF
+unset OS_SERVICE_TOKEN
+export OS_USERNAME=$USER
+export OS_PASSWORD=openstack
+export OS_AUTH_URL=http://$IP:5000/v3
+export PS1='[\u@\h \W(keystone_$OS_USERNAME)]\$ '
+
+export OS_PROJECT_NAME=$PROJECT
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_IDENTITY_API_VERSION=3
+EOF
+
+
 PROJECT_ID=`openstack project create $PROJECT -f value -c id`
 
 openstack user create --password "openstack" $USER
