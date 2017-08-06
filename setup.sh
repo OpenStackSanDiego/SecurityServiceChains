@@ -130,10 +130,10 @@ ovs-vsctl add-port br-ex bond0
 ## end of physical networking
 
 ## failsafe console login
-# openstack/openstack with sudo and ssh using root SSH key
-adduser -p 42ZTHaRqaaYvI --group wheel openstack
-cp ~root/.ssh/authorized_keys ~openstack/.ssh/
-chown -R openstack.openstack ~openstack/.ssh/
+# admin/openstack with sudo and ssh using root SSH key
+adduser -p 42ZTHaRqaaYvI --group wheel admin
+cp -R ~root/.ssh ~admin/
+chown -R admin.admin ~admin/.ssh/
 
 
 sync
