@@ -28,7 +28,7 @@ yum install -y python-networking-sfc
 NEUTRON_CONF=/etc/neutron/neutron.conf
 
 # enable the service plugin (controller nodes)
-sed -i '/^service_plugins=/ s/$/,networking_sfc.services.sfc.plugin.SfcPlugin/' /etc/neutron/neutron.conf
+sed -i '/^service_plugins=/ s/$/,networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin/' /etc/neutron/neutron.conf
 
 # specify drivers to use (controller nodes)
 cat <<EOF>> $NEUTRON_CONF
@@ -38,6 +38,7 @@ cat <<EOF>> $NEUTRON_CONF
 drivers = ovs
 
 [flowclassifier]
+
 drivers = ovs
 EOF
 
@@ -46,6 +47,7 @@ ML2_CONF=/etc/neutron/plugins/ml2/ml2_conf.ini
 cat <<EOF>>$ML2_CONF
 
 # networking-sfc extension
+[agent]
 extensions = sfc
 EOF
 
