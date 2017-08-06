@@ -19,7 +19,7 @@ unset OS_SERVICE_TOKEN
 export OS_USERNAME=$USER
 export OS_PASSWORD=openstack
 export OS_AUTH_URL=http://$IP:5000/v3
-export PS1='[\u@\h \W(keystone_$OS_USERNAME)]\$ '
+export PS1='[\u@\h \W(keystone_$USER)]\$ '
 
 export OS_PROJECT_NAME=$PROJECT
 export OS_USER_DOMAIN_NAME=Default
