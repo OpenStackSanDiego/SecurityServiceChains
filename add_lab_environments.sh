@@ -65,3 +65,21 @@ PUBLIC_NETWORK_ID=`openstack network show public -f value -c id`
 openstack router set --external-gateway $PUBLIC_NETWORK_ID $ROUTER_ID
 
 done
+
+
+
+# cheat sheet commands to create lab items
+
+# will not run - just here to be run manually when needed
+#SERVICE_NETWORK_ID=`openstack network create service -c id -f value`
+#INTERNAL_NETWORK_ID=`openstack network show internal -c id -f value`
+
+#openstack server create --image CirrosWeb --flavor m1.tiny --nic net-id=$INTERNAL_NETWORK_ID WebServer -c id -f value
+#openstack server create --image CirrosWeb --flavor m1.tiny --nic net-id=$INTERNAL_NETWORK_ID WebClient -c id -f value
+#SERVICE_NETWORK_ID=`openstack network show service -c id -f value`
+#openstack subnet create --subnet-range 10.10.10.0/24 --dhcp --allocation-pool start=10.10.10.100,end=10.10.10.200 --network $SERVICE_NETWORK_ID service-subnet
+
+#openstack port create --network service ingress-service-port-1
+#openstack port create --network service egress-service-port-2
+
+
