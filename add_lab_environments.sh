@@ -9,12 +9,12 @@ echo $PROJECT $USER $USER_HOME
 
 # userXX/openstack
 adduser -p 42ZTHaRqaaYvI $USER
-cp -R ~root/.ssh ~$USER_HOME
-chown -R $USER.$USER ~$USER_HOME/.ssh/
+cp -R ~root/.ssh $USER_HOME
+chown -R $USER.$USER $USER_HOME/.ssh/
 
 IP=`hostname -I | cut -d' ' -f 1`
 
-cat >> ~$USER_HOME/keystonerc << EOF
+cat >> $USER_HOME/keystonerc << EOF
 unset OS_SERVICE_TOKEN
 export OS_USERNAME=$USER
 export OS_PASSWORD=openstack
