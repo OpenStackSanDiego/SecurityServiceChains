@@ -39,8 +39,8 @@ $ openstack subnet create --subnet-range 10.10.10.0/24 --dhcp --allocation-pool 
 
 Create two ports on the service network to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
 ```bash
-$ openstack port create --network service service-port-1
-$ openstack port create --network service service-port-2
+$ openstack port create --network service ingres-service-port-1
+$ openstack port create --network service egress-service-port-1
 ```
 
 
@@ -117,8 +117,8 @@ neutron flow-classifier-create \
 ```bash
 neutron port-pair-create \
   --description "NetMon" \
-  --ingress p1 \
-  --egress p2 PP1
+  --ingress ingress-service-port-1 \
+  --egress egress-service-port-1 PP1
 ```
 
 * Create the Port Pair Group
