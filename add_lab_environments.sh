@@ -14,6 +14,7 @@ chown -R $USER.$USER $USER_HOME/.ssh/
 
 IP=`hostname -I | cut -d' ' -f 1`
 
+# create a keystone credential file for the new user
 cat >> $USER_HOME/keystonerc << EOF
 unset OS_SERVICE_TOKEN
 export OS_USERNAME=$USER
@@ -26,6 +27,14 @@ export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_DOMAIN_NAME=Default
 export OS_IDENTITY_API_VERSION=3
 EOF
+
+# have the keystone credentials read upon login of the new user
+cat >> $USER_HOME/.bashrc << EOF
+
+# OpenStack
+. ~/keystonerc
+EOF
+
 
 
 PROJECT_ID=`openstack project create $PROJECT -f value -c id`
