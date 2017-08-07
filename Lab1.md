@@ -100,17 +100,18 @@ Next we'll introduce a virtual machine with some network monitoring tools instal
 
 * Record the assigned port (ID) for the WebClient. We'll need this to create the service chain.
 ```bash
-openstack port list --server WebClient
+WEBCLIENT_ID=`openstack port list --server WebClient -c ID -f value`
+echo $WEBCLIENT_ID
 ```
 
 * Create the Flow Classifier
 ```bash
 neutron flow-classifier-create \
   --description "HTTP traffic from WebClient" \
-  --logical-source-port f9d265a7-90e2-41e1-8cf6-0d142e153d0b \
+  --logical-source-port $WEBCLIENT_ID \
   --ethertype IPv4 \
   --protocol tcp \
-  --destination-port 80:80 WebClientOutboundFlowClassifier
+  --destination-port 80:80 WebClientFC
 ```
 
 * Create the Port Pair
@@ -131,7 +132,7 @@ neutron port-pair-group-create \
 ```bash
 neutron port-chain-create \
   --port-pair-group PPG1 \
-  --flow-classifier WebClientOutboundFlowClassifier PC1
+  --flow-classifier WebClientFC PC1
 ```
 
 
