@@ -21,28 +21,40 @@ openstack security group rule create --dst-port 80 --protocol tcp --ingress defa
 openstack security group rule create --dst-port 22 --protocol tcp --ingress default
 ```
   
-## Image login info
+## Virtual machine images login info
   * admin/openstack for the CirrosWeb image
   * admin/openstack for the NetMon image
-  * admin/openstack for the physical server
 
+# Service Network
 
+Create a new network (service). This will be used to host the service chaining ports on the virtual machines. The existing "internal" network will be used for production traffic to/from the virtual machines.
 
-## Add a security management network
+```bash
+$ SERVICE_NETWORK_ID=`openstack network create service -c id -f value`
+$ openstack subnet create --subnet-range 10.10.10.0/24 --dhcp --allocation-pool start=10.10.10.100,end=10.10.10.200 --network $SERVICE_NETWORK_ID service-subnet
 
-Create a new network (service) and subnet (10.10.10.0/24). This will be used to host the service chaining ports on the virtual machines. The existing "internal" network will be used for production traffic to/from the virtual machines.
+```
+
+# Service Network Ports
+
+Create two ports on the service network to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
+```bash
+$ openstack port create --network service service-port-1
+$ openstack port create --network service service-port-2
+```
+
 
 # Instances
 
-Startup the following three images and assign floating IPs to all. 
+Startup the following three images and assign floating IPs to all. This can all be done via Horizon.
 
-| Instance Name | Image         | Flavor  | Network(s)      | Floating IP | Interfaces        | Notes                                 |
-| ------------- |:-------------:| -------:|----------------:|------------:|------------------:|--------------------------------------:|
-| WebClient     | CirrosWeb     | m1.tiny | internal        |  assign     | eth0              |                                       |
-| WebServer     | CirrosWeb     | m1.tiny | internal        |  assign     | eth0              |                                       |
-| NetMon        | NetMon        | m1.small| internal,service|  assign     | eth0, eth1, eth2  | eth0 to internal. eth{1,2} to service | 
+| Instance Name | Image         | Flavor  | Network(s)      | Floating IP | Additional Ports            |
+| ------------- |:-------------:| -------:|----------------:|------------:|-------------------------------------------------------:|
+| WebClient     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
+| WebServer     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
+| NetMon        | NetMon        | m1.small| internal,service|  assign     | service-port-1, service-port-2                         | 
 
-Ensure floating IPs are assigned to all instances. Associate the NetMon floating IP to the internal network (eth0).
+Ensure floating IPs are assigned to all instances. Associate the NetMon floating IP to the internal network port.
 
 
 ## Startup the Web Server
