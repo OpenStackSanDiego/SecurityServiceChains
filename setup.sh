@@ -106,7 +106,7 @@ glance  --os-image-api-version 2 image-create --protected True --name $IMG_NAME 
 
 # Cirros image with a basic web server running
 IMG_URL=http://shell.openstacksandiego.us/Images/CirrosWeb.img
-IMG_NAME=BasicWebServer
+IMG_NAME=CirrosWeb
 OS_DISTRO=cirros
 wget -q -O - $IMG_URL | \
 glance  --os-image-api-version 2 image-create --protected True --name $IMG_NAME \
