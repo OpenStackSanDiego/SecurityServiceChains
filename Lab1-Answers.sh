@@ -38,8 +38,8 @@ neutron flow-classifier-create   --description "HTTP traffic from WebClient" \
                                  --protocol tcp \
                                  --destination-port 80:80 WebClientFC
 neutron port-pair-create --description "NetMon" \
-                         --ingress ingress-service-port-1 \
-                         --egress egress-service-port-1 PP1
+                         --ingress ingress-01 \
+                         --egress egress-01 PP1
 neutron port-pair-group-create --port-pair PP1 PPG1
 neutron port-chain-create --port-pair-group PPG1 --flow-classifier WebClientFC PC1
 
