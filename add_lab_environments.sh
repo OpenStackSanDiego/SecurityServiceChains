@@ -72,7 +72,9 @@ done
 
 # cheat sheet commands to create lab items
 
-# will not run - just here to be run manually when needed
+#openstack security group rule create --dst-port 80 --protocol tcp --ingress default
+#openstack security group rule create --dst-port 22 --protocol tcp --ingress default
+
 #SERVICE_NETWORK_ID=`openstack network create service -c id -f value`
 #INTERNAL_NETWORK_ID=`openstack network show internal -c id -f value`
 
