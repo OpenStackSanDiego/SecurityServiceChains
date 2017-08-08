@@ -39,8 +39,8 @@ $ openstack subnet create --subnet-range 10.10.10.0/24 --dhcp --allocation-pool 
 
 Create two ports on the service network to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
 ```bash
-$ openstack port create --network service ingres-service-port-1
-$ openstack port create --network service egress-service-port-1
+$ openstack port create --network service ingres-1
+$ openstack port create --network service egress-1
 ```
 
 
@@ -52,7 +52,7 @@ Startup the following three images and assign floating IPs to all. This can all 
 | ------------- |:-------------:| -------:|----------------:|------------:|-------------------------------------------------------:|
 | WebClient     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
 | WebServer     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
-| NetMon        | NetMon        | m1.small| internal,service|  assign     | service-port-1, service-port-2                         | 
+| NetMon        | NetMon        | m1.small| internal,service|  assign     | ingress-1, egress-1                         | 
 
 Ensure floating IPs are assigned to all instances. Associate the NetMon floating IP to the internal network port.
 
@@ -118,8 +118,8 @@ neutron flow-classifier-create \
 ```bash
 neutron port-pair-create \
   --description "NetMon" \
-  --ingress ingress-service-port-1 \
-  --egress egress-service-port-1 PP1
+  --ingress ingress-1 \
+  --egress egress-1 PP1
 ```
 
 * Create the Port Pair Group
