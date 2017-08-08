@@ -82,6 +82,6 @@ done
 #openstack subnet create --subnet-range 10.10.10.0/24 --dhcp --allocation-pool start=10.10.10.100,end=10.10.10.200 --network $SERVICE_NETWORK_ID service-subnet
 
 #openstack port create --network service ingress-service-port-1
-#openstack port create --network service egress-service-port-2
+#openstack port create --network service egress-service-port-1
 
 
