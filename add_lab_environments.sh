@@ -9,6 +9,8 @@ echo $PROJECT $USER $USER_HOME
 
 # userXX/openstack
 adduser -p 42ZTHaRqaaYvI $USER
+USER_HOME=`getent passwd $USER |  cut -f6 -d:`
+
 cp -R ~root/.ssh $USER_HOME
 chown -R $USER.$USER $USER_HOME/.ssh/
 
