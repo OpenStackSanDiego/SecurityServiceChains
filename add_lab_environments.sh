@@ -81,7 +81,17 @@ done
 #SERVICE_NETWORK_ID=`openstack network show service -c id -f value`
 #openstack subnet create --subnet-range 10.10.10.0/24 --dhcp --allocation-pool start=10.10.10.100,end=10.10.10.200 --network $SERVICE_NETWORK_ID service-subnet
 
-#openstack port create --network service ingress-service-port-1
-#openstack port create --network service egress-service-port-1
+
+
+#INGRESS_PORT_ID=`openstack port create --network service ingress-01 -c id -f value`
+#EGRESS_PORT_ID=`openstack port create --network service egress-01 -c id -f value`
+
+#NETMON_ID=`openstack server create --image NetMon --flavor m1.small \
+#        --nic   net-id=$INTERNAL_NETWORK_ID \
+#        --nic   port-id=$INGRESS_PORT_ID \
+#        --nic   port-id=$EGRESS_PORT_ID \
+#        NetMon -c id -f value`
+
+
 
 
