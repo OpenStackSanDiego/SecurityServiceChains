@@ -1,3 +1,5 @@
+source ~/keystonerc_admin
+
 for i in 01 02 03;
 do
 
