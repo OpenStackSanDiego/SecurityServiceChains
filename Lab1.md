@@ -13,7 +13,9 @@
 
 ## Log into Horizon and OpenStack Controller
   * User the credentials and lab information provided on the lab handout
-  * The password for the Horizon login will be in ~admin/keystonerc_admin
+  * Your OS (SSH) and Horizon login will be in the form of userNN with NN being a two digit number (including leading zero)
+  * The userNN login will be used for the physical OpenStack controller and Horizon login
+  * Virtual machine logins will generic login account details below
 
 ## Networking Setup
   * Setup network security groups to allow SSH and HTTP to the project from your laptop external network
@@ -21,12 +23,12 @@
 openstack security group rule create --dst-port 80 --protocol tcp --ingress default
 openstack security group rule create --dst-port 22 --protocol tcp --ingress default
 ```
-  
 ## Virtual machine images login info
-  * admin/openstack for the CirrosWeb image
+  * admin/openstack for the CirrosWeb image (WebServer and WebClient instances)
   * admin/openstack for the NetMon image
 
-# Service Network
+# Lab Steps
+## Service Network
 
 Create a new network (service). This will be used to host the service chaining ports on the virtual machines. The existing "internal" network will be used for production traffic to/from the virtual machines.
 
@@ -35,17 +37,14 @@ $ SERVICE_NETWORK_ID=`openstack network create service -c id -f value`
 $ openstack subnet create --subnet-range 10.10.10.0/24 --dhcp --allocation-pool start=10.10.10.100,end=10.10.10.200 --network $SERVICE_NETWORK_ID service-subnet
 
 ```
-
-# Service Network Ports
+## Service Network Ports
 
 Create two ports on the service network to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
 ```bash
 $ openstack port create --network service ingres-1
 $ openstack port create --network service egress-1
 ```
-
-
-# Instances
+## Instances
 
 Startup the following three images and assign floating IPs to all. This can all be done via Horizon.
 
@@ -56,12 +55,10 @@ Startup the following three images and assign floating IPs to all. This can all 
 | NetMon        | NetMon        | m1.small| internal,service|  assign     | ingress-1, egress-1                         | 
 
 Ensure floating IPs are assigned to all instances. Associate the NetMon floating IP to the internal network port.
-
-
 ## Startup the Web Server
 
 We'll startup a small web server that simply responds back with a hostname string. This is simply to simulate a web server and to give us some traffic to monitor
-* Log into CirrosWebServer via SSH using the assigned floating IP
+* Log into WebServer via SSH using the assigned floating IP
 * su to root to gain superuser privileges
 ```bash
 $ sudo su -
@@ -75,8 +72,8 @@ $ sudo su -
 
 From the WebClient, we'll hit the WebServer to verify functionality of the webserver.
 
-* Log into CirrosClient via SSH using the assigned floating IP
-* Verify that the client can connect to the web server on the CirrosWebServer private IP
+* Log into WebClient via SSH using the assigned floating IP
+* Verify that the client can connect to the web server on the WebServer private IP
 ```bash
 $ curl 192.168.2.XXX
 ```
@@ -94,10 +91,7 @@ Next we'll introduce a virtual machine with some network monitoring tools instal
 # tcpdump -i eth1 not port 22
 ```
 
-
-
 ## Service Chaining
-
 
 * Log into the physical OpenStack controller via SSH (IP address provided on the lab handout). The OpenStack credentials (keystonerc) will be loaded automatically when you login.
 
