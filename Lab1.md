@@ -13,6 +13,7 @@
 
 ## Log into Horizon and OpenStack Controller
   * User the credentials and lab information provided on the lab handout
+  * The password for the Horizon login will be in ~admin/keystonerc_admin
 
 ## Networking Setup
   * Setup network security groups to allow SSH and HTTP to the project from your laptop external network
@@ -58,6 +59,8 @@ Ensure floating IPs are assigned to all instances. Associate the NetMon floating
 
 
 ## Startup the Web Server
+
+We'll startup a small web server that simply responds back with a hostname string. This is simply to simulate a web server and to give us some traffic to monitor
 * Log into CirrosWebServer via SSH using the assigned floating IP
 * su to root to gain superuser privileges
 ```bash
@@ -70,7 +73,7 @@ $ sudo su -
 
 ## Initial web-server Test
 
-We'll startup a small web server that simply responds back with a hostname string. This is simply to simulate a web server and to give us some traffic to monitor.
+From the WebClient, we'll hit the WebServer to verify functionality of the webserver.
 
 * Log into CirrosClient via SSH using the assigned floating IP
 * Verify that the client can connect to the web server on the CirrosWebServer private IP
@@ -79,7 +82,7 @@ $ curl 192.168.2.XXX
 ```
 * Verify that the hostname of the web server is returned as the response from the remote Web Server
 
-## Network Traffic Monitoring
+## Startup Network Traffic Monitoring
 
 Next we'll introduce a virtual machine with some network monitoring tools installed (tcpdump and snort)
 
@@ -135,5 +138,19 @@ neutron port-chain-create \
   --flow-classifier WebClientFC PC1
 ```
 
+## Verify service chain functionality
+
+* Log into WebClient via SSH using the assigned floating IP
+* Generate traffic from the WebClient to the WebServer
+```bash
+$ curl 192.168.2.XXX
+```
+* Verify that the tcpdump monitor on NetMon saw the traffic being pushed through the service chain
+
+## Tear down the lab
+
+* Delete the NetMon virtual machine
+* Delete the service chains (pair groups, port pairs, and flow classifier)
+* The service network, WebServer, and WebClient will be used for future labs so leave them running
 
 
