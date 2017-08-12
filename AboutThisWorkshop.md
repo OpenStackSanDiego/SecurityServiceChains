@@ -10,7 +10,7 @@ Some background about this workshop around how it works and why we we put it tog
 
 I (John) got involved with OpenStack when a client asked me to put together a bundle of multiple underlying security products (i.e. an IDS/IPS/DDOS/DLP combo of multiple products/VMs) that could quickly and seamlessly be deployed into a customers virtual private cloud. Normally this would be done at layer three (IP) and route traffic through various devices. Unfortunately, this requires reconfiguration of the customers network as these additional networks are introduced. This is best done at layer 2 allowing virtualized security solutions to be slipped in and out of the traffic flow without requiring any changes to the layer 3 networking. This lead me to looking at OpenStack Neutron plugins that allow for such layer 2 manipulation of traffic.
 
-This workshop provides all the tools needed to deploy a number of open source security products within an OpenStack layer two cloud. This includes a full OpenStack cloud, an OpenStack neutron plugin with layer two support (MidoNet), some open source security tools and the instructions to make it all happen.
+This workshop provides all the tools needed to deploy a number of open source security products within an OpenStack layer two cloud. This includes a full OpenStack cloud, an OpenStack neutron plugin with layer two support, some open source security tools and the instructions to make it all happen.
 
 ## OpenStack with Networking Service Function Chaining Plugin
 
