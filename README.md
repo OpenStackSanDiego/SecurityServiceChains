@@ -22,4 +22,10 @@ This workshop consists of a number of exercises going from the basics through mo
 * Lab 2 https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab2.md
 * Lab 3 https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab3.md
 
+# Answers
+
+If you get stuck, the "answers" to the lab are available as a list of command lines.
+
+* Lab 1 Answers https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab1-Answers.sh
+
 
