@@ -3,6 +3,7 @@
 
 # Overview
 
+In this first exercise we'll be adding a rule to move traffic through a virtual machine configured with the network monitoring tool TCPDump. This exercise walks through the basics of setting up your first set of chain rules.
 
 # Goals
 
