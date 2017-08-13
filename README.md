@@ -18,8 +18,8 @@ As part of this workshop, each attendee will be assigned a physical server runni
 
 This workshop consists of a number of exercises going from the basics through more advanced configurations. Once you've completed the steps below to familiarize your self and configure the lab, please proceed to the exercises.
 
-Lab 1 https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab1.md
-Lab 2 https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab2.md
-Lab 3 https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab3.md
+* Lab 1 https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab1.md
+* Lab 2 https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab2.md
+* Lab 3 https://github.com/OpenStackSanDiego/SecurityServiceChains/blob/master/Lab3.md
 
 
