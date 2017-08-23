@@ -48,6 +48,7 @@ openstack user create --password "openstack" $USER
 openstack role create $USER
 
 openstack role add --project $PROJECT --user $USER $USER
+openstack role add --project $PROJECT --user $USER _member_
 
 NETWORK_ID=`openstack network create internal --project $PROJECT_ID -f value -c id`
 
