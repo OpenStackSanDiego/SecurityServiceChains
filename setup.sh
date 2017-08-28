@@ -43,7 +43,7 @@ drivers = ovs
 EOF
 
 # enable extension (compute nodes)
-ML2_CONF=/etc/neutron/plugins/ml2/ml2_conf.ini
+ML2_CONF=/etc/neutron/plugins/ml2/openvswitch_agent.ini
 cat <<EOF>>$ML2_CONF
 
 # networking-sfc extension
