@@ -145,6 +145,17 @@ adduser -p 42ZTHaRqaaYvI --group wheel admin
 cp -R ~root/.ssh ~admin/
 chown -R admin.admin ~admin/.ssh/
 
+# setup the admin OpenStack credentials for the admin account
+cp ~root/keystonerc_admin ~admin/
+chown admin.admin ~admin/keystonerc_admin
+
+# have the keystone credentials read upon login of the admin user
+cat >> ~admin/.bashrc << EOF
+
+# OpenStack
+. ~/keystonerc
+EOF
+
 
 sync
 sleep 1
