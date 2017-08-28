@@ -83,20 +83,6 @@ openstack subnet create                         \
 
 
 # install some OS images
-IMG_URL=https://download.fedoraproject.org/pub/alt/atomic/stable/Fedora-Atomic-25-20170626.0/CloudImages/x86_64/images/Fedora-Atomic-25-20170626.0.x86_64.qcow2
-IMG_NAME=Fedora-Atomic-25
-OS_DISTRO=fedora-atomic
-wget -q -O - $IMG_URL | \
-glance  --os-image-api-version 2 image-create --protected True --name $IMG_NAME \
-        --visibility public --disk-format raw --container-format bare --property os_distro=$OS_DISTRO --progress
-        
-IMG_URL=https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
-IMG_NAME=CentOS-7
-OS_DISTRO=centos
-wget -q -O - $IMG_URL | \
-glance  --os-image-api-version 2 image-create --protected True --name $IMG_NAME \
-        --visibility public --disk-format raw --container-format bare --property os_distro=$OS_DISTRO --progress  
-	
 IMG_URL=http://shell.openstacksandiego.us/Images/NetMon.img
 IMG_NAME=NetMon
 OS_DISTRO=centos
