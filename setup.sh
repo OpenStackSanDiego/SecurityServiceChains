@@ -139,7 +139,7 @@ chown admin.admin ~admin/keystonerc_admin
 cat >> ~admin/.bashrc << EOF
 
 # OpenStack
-. ~/keystonerc
+. ~/keystonerc_admin
 EOF
 
 
