@@ -154,4 +154,3 @@ $ curl 192.168.2.XXX
 * Delete the NetMon virtual machines
 * Delete the service chains (pair groups, port pairs, and flow classifier)
 * Delete the WebClient virtual machines
-* The service network will be used for future labs so leave it running
