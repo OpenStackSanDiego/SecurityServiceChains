@@ -29,18 +29,9 @@ openstack security group rule create --dst-port 22 --protocol tcp --ingress defa
   * admin/openstack for the NetMon image
 
 # Lab Steps
-## Service Network
+## Network Monitoring Ports
 
-Create a new network (service) if necessary (you may reuse the service network from an earlier lab). This will be used to host the service chaining ports on the virtual machines. The existing "internal" network will be used for production traffic to/from the virtual machines.
-
-```bash
-$ SERVICE_NETWORK_ID=`openstack network create service -c id -f value`
-$ openstack subnet create --subnet-range 10.10.10.0/24 --dhcp --allocation-pool start=10.10.10.100,end=10.10.10.200 --network $SERVICE_NETWORK_ID service-subnet
-
-```
-## Service Network Ports
-
-Create foud ports on the service network to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
+Create four ports to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
 ```bash
 $ openstack port create --network service ingres-1
 $ openstack port create --network service egress-1
@@ -55,10 +46,10 @@ Startup the following three images and assign floating IPs to all. This can all 
 | ------------- |:-------------:| -------:|----------------:|------------:|-------------------------------------------------------:|
 | WebClient     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
 | WebServer     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
-| NetMon1       | NetMon        | m1.small| internal,service|  assign     | ingress-1, egress-1                         | 
-| NetMon2       | NetMon        | m1.small| internal,service|  assign     | ingress-2, egress-2                         | 
+| NetMon1       | NetMon        | m1.small| internal        |  assign     | ingress-1, egress-1                         | 
+| NetMon2       | NetMon        | m1.small| internal        |  assign     | ingress-2, egress-2                         | 
 
-Ensure floating IPs are assigned to all instances. Associate the NetMon floating IP to the internal network port.
+Ensure floating IPs are assigned to all instances.
 
 ## Startup the Web Server
 
