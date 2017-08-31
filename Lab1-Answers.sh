@@ -32,10 +32,10 @@ neutron flow-classifier-create   --description "HTTP traffic from WebClient" \
                                  --logical-source-port $WEBCLIENT_ID \
                                  --ethertype IPv4 \
                                  --protocol tcp \
-                                 --destination-port 80:80 WebClientFC
+                                 --destination-port 80:80 FC1
 neutron port-pair-create --description "NetMon" \
                          --ingress ingress-01 \
                          --egress egress-01 PP1
 neutron port-pair-group-create --port-pair PP1 PPG1
-neutron port-chain-create --port-pair-group PPG1 --flow-classifier WebClientFC PC1
+neutron port-chain-create --port-pair-group PPG1 --flow-classifier FC1 PC1
 
