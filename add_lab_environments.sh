@@ -62,6 +62,8 @@ SUBNET_ID=`openstack subnet create              \
         --project $PROJECT_ID                   \
         $INTERNAL_SUBNET -f value -c id`
 
+# port security needs to be off for service chains
+openstack network set --disable-port-security $NETWORK_ID
 
 ROUTER_ID=`openstack router create --project $PROJECT_ID router -f value -c id`
 openstack router add subnet $ROUTER_ID $SUBNET_ID
