@@ -133,10 +133,74 @@ $ curl 192.168.2.XXX
 ```
 * Verify that the tcpdump monitor on NetMon saw the traffic being pushed through the service chain
 
+
+## Bridge Traffic with tcpdump
+
+The current service chain brings traffic to the netmon instance but it doesn't travel through the vm. Bridging the ingress and egress ports allows traffic to flow through the vm and onto the web server. The bridge can then be used by tcpdump to monitor traffic as it flows through the vm.
+
+* Setup the Bridge on netmon
+```bash
+yum install bridge-utils
+brctl addbr br0
+brctl stp br0 on
+ifconfig eth1 0.0.0.0 down
+ifconfig eth2 0.0.0.0 down
+brctl addif br0 eth1
+brctl addif br0 eth2
+ifconfig eth1 up
+ifconfig eth2 up
+ifconfig br0 up
+```
+
+* Startup tcpdump on netmon using the bridge
+```bash
+tcpdump -i br0 port 80
+```
+
+* Generate traffic from the WebClient to the WebServer
+```bash
+$ curl 192.168.2.XXX
+```
+* Verify that the tcpdump monitor on NetMon saw the traffic being pushed through the service chain
+* Verify that the curl command received a response back from the web server
+
+## Tear down the Bridge
+
+Remove the bridge so that an inline Snort bridge can be setup.
+
+```bash
+brctl delif br0 eth1
+brctl delif br0 eth2
+ifconfig br0 down
+brctl delbr br0
+```
+
+## Inline Bridge with Snort
+Next we'll be using Snort as an inline bridge to monitor and pass traffic.
+
+* Startup Snort inline on netmon
+```bash
+snort -A console -Q -c snort.conf -Q -i eth1:eth2 -N
+```
+
+* Generate traffic from the WebClient to the WebServer
+```bash
+$ curl 192.168.2.XXX
+```
+* Verify that the Snort on NetMon saw the traffic
+* Verify that the curl command received a response back from the web server
+
 ## Tear down the lab
 
 * Delete the NetMon virtual machine
-* Delete the service chains (pair groups, port pairs, and flow classifier)
+* Delete the service chains from the controller
+```bash
+neutron port-chain-delete PC1
+neutron port-pair-group-delete PPG1
+neutron port-pair-delete PP1
+neutron flow-classifier-delete FC1
+```
+
 * The WebServer and WebClient will be used for future labs so leave them running
 
 
