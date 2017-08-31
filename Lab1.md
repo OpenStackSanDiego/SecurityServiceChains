@@ -100,7 +100,7 @@ neutron flow-classifier-create \
   --logical-source-port $WEBCLIENT_ID \
   --ethertype IPv4 \
   --protocol tcp \
-  --destination-port 80:80 WebClientFC
+  --destination-port 80:80 FC1
 ```
 
 * Create the Port Pair
@@ -121,7 +121,7 @@ neutron port-pair-group-create \
 ```bash
 neutron port-chain-create \
   --port-pair-group PPG1 \
-  --flow-classifier WebClientFC PC1
+  --flow-classifier FC1 PC1
 ```
 
 ## Verify service chain functionality
