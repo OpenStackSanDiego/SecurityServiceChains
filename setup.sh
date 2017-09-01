@@ -38,11 +38,7 @@ yum install -y python-networking-sfc
 
 # enable the service plugin (controller nodes)
 NEUTRON_CONF=/etc/neutron/neutron.conf
-cat <<EOF>> $NEUTRON_CONF
-
-# enable service chains
-service_plugins=networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin
-EOF
+sed -i '/^service_plugins=/ s/$/,networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin/' $NEUTRON_CONF
 
 # specify drivers to use (controller nodes)
 cat <<EOF>> $NEUTRON_CONF
