@@ -25,7 +25,11 @@ sed -i 's/resources:index/resource:index/g' /usr/share/openstack-dashboard/opens
 
 
 ML2_CONF=/etc/neutron/plugins/ml2/ml2_conf.ini
-sed -i '/^extension_drivers=/ s/$/,port_security/' $ML2_CONF
+cat <<EOF>> $ML2_CONF
+
+# enable the port security extension to support service chains
+extension_drivers=port_security
+EOF
 
 
 ## install and configure networing-sfc
@@ -34,7 +38,11 @@ yum install -y python-networking-sfc
 
 # enable the service plugin (controller nodes)
 NEUTRON_CONF=/etc/neutron/neutron.conf
-sed -i '/^service_plugins=/ s/$/,networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin/' $NEUTRON_CONF
+cat <<EOF>> $NEUTRON_CONF
+
+# enable service chains
+service_plugins=networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin
+EOF
 
 # specify drivers to use (controller nodes)
 cat <<EOF>> $NEUTRON_CONF
