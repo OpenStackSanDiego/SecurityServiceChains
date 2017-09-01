@@ -23,8 +23,8 @@ sed -i 's/resources:index/resource:index/g' /usr/share/openstack-dashboard/opens
 # install the port security extension so that port security can be turned on/off per network/por
 # service chaining requires port security turned off
 ML2_CONF=/etc/neutron/plugins/ml2/ml2_conf.ini
-sed -i '/^extension_drivers=/ s/$/,port_security/' $ML2_CONF
-sed -i '/#extension_drivers/ s/$/extension_drivers = port_security/' $ML2_CONF
+sed -i '/^extension_drivers\w*=/ s/$/,port_security/' $ML2_CONF
+sed -i '/#extension_drivers\w*=/ s/$/extension_drivers = port_security/' $ML2_CONF
 
 
 
