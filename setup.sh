@@ -24,7 +24,7 @@ sed -i 's/resources:index/resource:index/g' /usr/share/openstack-dashboard/opens
 # service chaining requires port security turned off
 ML2_CONF=/etc/neutron/plugins/ml2/ml2_conf.ini
 sed -i '/^extension_drivers\s*=/ s/$/,port_security/' $ML2_CONF
-sed -i '/#extension_drivers\s*=/ s/$/extension_drivers = port_security/' $ML2_CONF
+sed -i '/#extension_drivers\s*=/ s//extension_drivers = port_security/' $ML2_CONF
 
 
 
