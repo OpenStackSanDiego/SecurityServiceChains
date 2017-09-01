@@ -23,13 +23,9 @@ sed -i 's/resources:index/resource:index/g' /usr/share/openstack-dashboard/opens
 # install the port security extension so that port security can be turned on/off per network/por
 # service chaining requires port security turned off
 ML2_CONF=/etc/neutron/plugins/ml2/ml2_conf.ini
-sed -i '/^#extension_drivers=/ s/$/,port_security/' $ML2_CONF
+sed -i '/^extension_drivers=/ s/$/,port_security/' $ML2_CONF
 sed -i '/#extension_drivers/ s/$/extension_drivers = port_security/' $ML2_CONF
-cat <<EOF>> $ML2_CONF
 
-# enable the port security extension to support service chains
-extension_drivers=port_security
-EOF
 
 
 ## install and configure networing-sfc
@@ -38,8 +34,8 @@ yum install -y python-networking-sfc
 
 # enable the service plugin (controller nodes)
 NEUTRON_CONF=/etc/neutron/neutron.conf
-sed -i '/^#service_plugins=/ s/$/service_plugins = networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin/' $NEUTRON_CONF
 sed -i '/^service_plugins=/ s/$/,networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin/' $NEUTRON_CONF
+sed -i '/^#service_plugins=/ s//service_plugins = networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin/' $NEUTRON_CONF
 
 # specify drivers to use (controller nodes)
 cat <<EOF>> $NEUTRON_CONF
@@ -55,12 +51,8 @@ EOF
 
 # enable extension (compute nodes)
 ML2_OPENVSWITCH_CONF=/etc/neutron/plugins/ml2/openvswitch_agent.ini
-cat <<EOF>>$ML2_OPENVSWITCH_CONF
-
-# networking-sfc extension
-[agent]
-extensions = sfc
-EOF
+sed -i '/^extensions =/ s/$/,sfc/' $ML2_OPENVSWITCH_CONF
+sed -i '/#extensions =/ s//extensions = sfc/' $ML2_OPENVSWITCH_CONF
 
 # database setup
 neutron-db-manage --subproject networking-sfc upgrade head
