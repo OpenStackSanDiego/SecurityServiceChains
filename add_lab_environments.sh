@@ -40,7 +40,7 @@ cat >> $USER_HOME/.bashrc << EOF
 EOF
 
 # copy over the answers
-wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab1-Answers.sh -O ~user02/Lab1-Answers.sh
+wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab1-Answers.sh -O $USER_HOME/Lab1-Answers.sh
 
 
 PROJECT_ID=`openstack project create $PROJECT -f value -c id`
