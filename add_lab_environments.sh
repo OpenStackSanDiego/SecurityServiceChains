@@ -1,6 +1,6 @@
 source ~/keystonerc_admin
 
-for i in 01 02 03;
+for i in 1 2 3;
 do
 
 PROJECT=project$i
@@ -55,7 +55,7 @@ openstack role add --project $PROJECT --user $USER _member_
 NETWORK_ID=`openstack network create internal --project $PROJECT_ID -f value -c id`
 
 DNS_NAMESERVER=`grep -i nameserver /etc/resolv.conf | cut -d ' ' -f2 | head -1`
-INTERNAL_SUBNET=192.168.10.0/24
+INTERNAL_SUBNET=192.168.$i.0/24
 
 SUBNET_ID=`openstack subnet create              \
         --network $NETWORK_ID                   \
