@@ -1,6 +1,6 @@
 source ~/keystonerc_admin
 
-for i in 1 2 3;
+for i in 16;
 do
 
 PROJECT=project$i
@@ -10,16 +10,16 @@ USER_HOME=`eval echo "~$USER"`
 echo $PROJECT $USER $USER_HOME
 
 # userXX/openstack
-adduser -p 42ZTHaRqaaYvI $USER -G wheel
+sudo adduser -p 42ZTHaRqaaYvI $USER -G wheel
 USER_HOME=`getent passwd $USER |  cut -f6 -d:`
 
-cp -R ~root/.ssh $USER_HOME
-chown -R $USER.$USER $USER_HOME/.ssh/
+sudo cp -R ~root/.ssh $USER_HOME
+sudo chown -R $USER.$USER $USER_HOME/.ssh/
 
 IP=`hostname -I | cut -d' ' -f 1`
 
 # create a keystone credential file for the new user
-cat >> $USER_HOME/keystonerc << EOF
+sudo cat >> $USER_HOME/keystonerc << EOF
 unset OS_SERVICE_TOKEN
 export OS_USERNAME=$USER
 export OS_PASSWORD=openstack
@@ -33,14 +33,14 @@ export OS_IDENTITY_API_VERSION=3
 EOF
 
 # have the keystone credentials read upon login of the new user
-cat >> $USER_HOME/.bashrc << EOF
+sudo cat >> $USER_HOME/.bashrc << EOF
 
 # OpenStack
 . ~/keystonerc
 EOF
 
 # copy over the answers
-wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab1-Answers.sh -O $USER_HOME/Lab1-Answers.sh
+sudo wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab1-Answers.sh -O $USER_HOME/Lab1-Answers.sh
 
 
 PROJECT_ID=`openstack project create $PROJECT -f value -c id`
@@ -67,7 +67,7 @@ SUBNET_ID=`openstack subnet create              \
 # port security needs to be off for service chains
 openstack network set --disable-port-security $NETWORK_ID
 
-ROUTER_ID=`openstack router create --project $PROJECT_ID router -f value -c id`
+ROUTER_ID=`openstack router create --project $PROJECT_ID router$i -f value -c id`
 openstack router add subnet $ROUTER_ID $SUBNET_ID
 
 PUBLIC_NETWORK_ID=`openstack network show public -f value -c id`
@@ -75,15 +75,16 @@ openstack router set --external-gateway $PUBLIC_NETWORK_ID $ROUTER_ID
 
 # setup route from physical server to this subnet
 NET_GATEWAY=$(sudo ip netns exec qrouter-"${ROUTER_ID}" ip -4 route get 8.8.8.8 | head -n1 | awk '{print $7}')
-ip route replace "${INTERNAL_SUBNET}" via $NET_GATEWAY
-
+if [ "${NET_GATEWAY}" = "" ]; then
+  echo "waiting for network..."
+  sleep 2
+  NET_GATEWAY=$(sudo ip netns exec qrouter-"${ROUTER_ID}" ip -4 route get 8.8.8.8 | head -n1 | awk '{print $7}')
+fi
+if [ "${NET_GATEWAY}" = "" ]; then
+  echo "waiting for network..."
+  sleep 5
+  NET_GATEWAY=$(sudo ip netns exec qrouter-"${ROUTER_ID}" ip -4 route get 8.8.8.8 | head -n1 | awk '{print $7}')
+fi
+sudo ip route replace "${INTERNAL_SUBNET}" via $NET_GATEWAY
 
 done
-
-
-
-
-
-
-
-
