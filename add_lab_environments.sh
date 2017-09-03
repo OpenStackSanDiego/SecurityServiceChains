@@ -73,6 +73,11 @@ openstack router add subnet $ROUTER_ID $SUBNET_ID
 PUBLIC_NETWORK_ID=`openstack network show public -f value -c id`
 openstack router set --external-gateway $PUBLIC_NETWORK_ID $ROUTER_ID
 
+# setup route from physical server to this subnet
+NET_GATEWAY=$(sudo ip netns exec qrouter-"${ROUTER_ID}" ip -4 route get 8.8.8.8 | head -n1 | awk '{print $7}')
+ip route replace "${INTERNAL_SUBNET}" via $NET_GATEWAY
+
+
 done
 
 
