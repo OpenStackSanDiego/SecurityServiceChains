@@ -19,6 +19,10 @@ sed -i 's/resources:index/resource:index/g' /usr/share/openstack-dashboard/opens
 
 ## end of base OpenStack cloud install
 
+# easy modification of .ini configuration files
+yum install -y crudini
+
+
 
 # install the port security extension so that port security can be turned on/off per network/por
 # service chaining requires port security turned off
