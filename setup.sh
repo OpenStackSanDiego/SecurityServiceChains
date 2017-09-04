@@ -26,37 +26,23 @@ yum install -y crudini
 
 # install the port security extension so that port security can be turned on/off per network/por
 # service chaining requires port security turned off
-ML2_CONF=/etc/neutron/plugins/ml2/ml2_conf.ini
-sed -i '/^extension_drivers\s*=/ s/$/,port_security/' $ML2_CONF
-sed -i '/#extension_drivers\s*=/ s//extension_drivers = port_security/' $ML2_CONF
+crudini --set --list /etc/neutron/plugins/ml2/ml2_conf.ini ml2 driver_extensions port_security
 
 
 
 ## install and configure networing-sfc
-
 yum install -y python-networking-sfc
 
 # enable the service plugin (controller nodes)
-NEUTRON_CONF=/etc/neutron/neutron.conf
-sed -i '/^service_plugins\s*=/ s/$/,networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin/' $NEUTRON_CONF
-sed -i '/^#service_plugins\s*=/ s//service_plugins = networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin,networking_sfc.services.sfc.plugin.SfcPlugin/' $NEUTRON_CONF
+crudini --set --list /etc/neutron/neutron.conf DEFAULT service_plugins networking_sfc.services.flowclassifier.plugin.FlowClassifierPlugin
+crudini --set --list /etc/neutron/neutron.conf DEFAULT service_plugins networking_sfc.services.sfc.plugin.SfcPlugin
 
 # specify drivers to use (controller nodes)
-cat <<EOF>> $NEUTRON_CONF
-
-# networking-sfc
-[sfc]
-drivers = ovs
-
-[flowclassifier]
-
-drivers = ovs
-EOF
+crudini --set --list /etc/neutron/neutron.conf sfc drivers ovs
+crudini --set --list /etc/neutron/neutron.conf flowclassifier drivers ovs
 
 # enable extension (compute nodes)
-ML2_OPENVSWITCH_CONF=/etc/neutron/plugins/ml2/openvswitch_agent.ini
-sed -i '/^extensions\s*=/ s/$/,sfc/' $ML2_OPENVSWITCH_CONF
-sed -i '/#extensions\s*=/ s//extensions = sfc/' $ML2_OPENVSWITCH_CONF
+crudini --set --list /etc/neutron/plugins/ml2/openvswitch_agent.ini agent extensions sfc
 
 # database setup
 neutron-db-manage --subproject networking-sfc upgrade head
