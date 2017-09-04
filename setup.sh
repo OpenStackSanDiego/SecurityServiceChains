@@ -26,7 +26,7 @@ yum install -y crudini
 
 # install the port security extension so that port security can be turned on/off per network/por
 # service chaining requires port security turned off
-crudini --set --list /etc/neutron/plugins/ml2/ml2_conf.ini ml2 driver_extensions port_security
+crudini --set --list /etc/neutron/plugins/ml2/ml2_conf.ini ml2 extension_drivers port_security
 
 
 
