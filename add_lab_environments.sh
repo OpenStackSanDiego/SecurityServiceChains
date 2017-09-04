@@ -15,6 +15,7 @@ USER_HOME=`getent passwd $USER |  cut -f6 -d:`
 
 sudo cp -R ~root/.ssh $USER_HOME
 sudo chown -R $USER.$USER $USER_HOME/.ssh/
+sudo chmod 700 $USER_HOME/.ssh/
 
 IP=`hostname -I | cut -d' ' -f 1`
 
