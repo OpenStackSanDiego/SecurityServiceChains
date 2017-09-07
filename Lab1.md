@@ -3,19 +3,19 @@
 
 # Overview
 
-In this first exercise we'll be adding a rule to move traffic through a virtual machine configured with the network monitoring tool TCPDump. This exercise walks through the basics of setting up your first set of chain rules.
+In this first exercise we'll be adding a rule to move traffic through a virtual machine configured with the network monitoring tool TCPDump. This exercise walks through the basics of setting up your first service chain and service functions. The service functions will be setup in three different modes (IP forwarded, bridged, and snort IDS inline).
 
 # Goals
 
   * Monitor inbound web (HTTP) traffic from a web client to web server
   * Setup a service chain to monitor the packet flows
-  * Setup a service function in each of routing, bridged, and inline configurations
+  * Setup a service function in each of IP forwarded, bridged, and inline configurations
 
 # Prereq
 
   * Use the credentials and lab information provided on the lab handout
-  * Your OS (SSH) and Horizon login will be in the form of userNN with NN being a one or two digit number
-  * The userNN login will be used for the physical OpenStack controller and Horizon login
+  * Your OS (SSH) and Horizon login will be in the form of userN with N being a one or two digit number
+  * The userN login will be used for the physical OpenStack controller and Horizon login
 
 # Lab Steps
 
