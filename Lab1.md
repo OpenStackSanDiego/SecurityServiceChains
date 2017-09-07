@@ -41,44 +41,92 @@ openstack security group rule create --dst-port 22 --protocol tcp --ingress defa
 # Lab Steps
 ## Network Ports
 
-Create two ports on the internal network to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
+Create three ports for the network monitoring service function. One port will be for administrative purposes (port-admin1) to manage the virtual machine via an SSH session. The other two ports (port-ingress1 and port-egress1) will be the ingress and egress of network traffic in and out of the service function.
+
+Create one port each for the web client and web server virtual machines.
+
+All of these ports will be on the internal network.
+
 ```bash
-$ openstack port create --network internal ingres-1
-$ openstack port create --network internal egress-1
+for port in port-admin1 port-ingress1 port-egress1 port-webclient port-webserver
+do
+    openstack port create --network internal "${port}"
+done
 ```
+
 ## Instances
 
 Startup the following three images and assign floating IPs to all. This can all be done via Horizon.
 
-| Instance Name | Image         | Flavor  | Network(s)      | Floating IP | Additional Ports            |
-| ------------- |:-------------:| -------:|----------------:|------------:|-------------------------------------------------------:|
-| WebClient     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
-| WebServer     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
-| NetMon        | NetMon        | m1.small| internal        |  assign     | ingress-1, egress-1, management                         | 
+| Instance Name | Image         | Flavor  | Ports                                        | 
+| ------------- |:-------------:| -------:|---------------------------------------------:|
+| WebClient     | cirros        | m1.tiny | port-webclient                               |
+| WebServer     | cirros        | m1.tiny | port-webserver                               |
+| NetMon        | NetMon        | m1.small| port-admin1, port-ingress1, port-egress1     |
 
-Ensure floating IPs are assigned to all instances. Associate the NetMon floating IP to the internal network port.
+
+* Startup the NetMon VM
+```bash
+openstack server create \
+	--image NetMon \
+	--flavor m1.small \
+	--nic port-id=port-admin1 \
+	--nic port-id=port-ingress1 \
+	--nic port-id=port-egress1 \
+	--key-name default \
+	NetMon1
+```
+
+* Startup the Web Client VM
+```bash
+openstack server create \
+	--image cirros \
+	--flavor m1.tiny \
+ --nic port-id=port-webclient \
+ --key-name default \
+	webclient
+```
+
+* Startup the Web Server VM
+```bash
+openstack server create \
+	--image cirros \
+	--flavor m1.tiny \
+ --nic port-id=port-webserver \
+ --key-name default \
+	webserver
+```
+
 ## Startup the Web Server
 
 We'll startup a small web server that simply responds back with a hostname string. This is simply to simulate a web server and to give us some traffic to monitor
-* Log into WebServer via SSH using the assigned floating IP
-* su to root to gain superuser privileges
+
+* Startup a web server process
 ```bash
-$ sudo su -
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBSERVER_IP=$WEBSERVER_IP
+
+ssh cirros@${WEBSERVER_IP} 'while true; do echo -e "HTTP/1.0 200 OK\r\n\r\nWelcome to $(hostname)" | sudo nc -l -p 80 ; done&'
 ```
-* Startup the web server via the command "hostname-webserver.sh"
+
+* Validate that the web server process is running
 ```bash
-# ./hostname-webserver.sh
+curl $WEBSERVER_IP
 ```
 
 ## Initial web-server Test
 
 From the WebClient, we'll hit the WebServer to verify functionality of the webserver.
 
-* Log into WebClient via SSH using the assigned floating IP
-* Verify that the client can connect to the web server on the WebServer private IP
-```bash
-$ curl 192.168.2.XXX
+* Log into WebClient via SSH
 ```
+WEBCLIENT_IP=$(openstack port show port-client -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBCLIENT_IP=$WEBCLIENT_IP
+ssh cirros@${WEBCLIENT_IP}
+```
+
+* Verify that the client can connect to the web server using curl
+
 * Verify that the hostname of the web server is returned as the response from the remote Web Server
 
 ## Startup Network Traffic Monitoring
