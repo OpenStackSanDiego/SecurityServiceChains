@@ -7,29 +7,39 @@ In this first exercise we'll be adding a rule to move traffic through a virtual 
 
 # Goals
 
-  * Monitor inbound web (HTTP) traffic from the client to web
-  * Utilize service chains to monitor the packet flows
+  * Monitor inbound web (HTTP) traffic from a web client to web server
+  * Setup a service chain to monitor the packet flows
+  * Setup a service function in each of routing, bridged, and inline configurations
 
 # Prereq
 
-## Log into Horizon and OpenStack Controller
-  * User the credentials and lab information provided on the lab handout
-  * Your OS (SSH) and Horizon login will be in the form of userNN with NN being a two digit number (including leading zero)
+  * Use the credentials and lab information provided on the lab handout
+  * Your OS (SSH) and Horizon login will be in the form of userNN with NN being a one or two digit number
   * The userNN login will be used for the physical OpenStack controller and Horizon login
-  * Virtual machine logins will generic login account details below
+
+# Lab Steps
+
+## Log into Horizon and OpenStack Controller
+
+  * Log into the OpenStack dashboard via a web brower using the credentials provided
+  * Log into the controller via SSH using the credentials provided
+    
+## Virtual Machine Credentials
+
+* Import the SSH keypair into OpenStack for use in accessing the deployed VMs
+```bash
+openstack keypair create --public-key ~/.ssh/id_rsa.pub default
+```
 
 ## Networking Setup
-  * Setup network security groups to allow SSH and HTTP to the project from your laptop external network
+  * Setup network security groups to allow SSH and HTTP to deployed virtual machines
 ```bash
 openstack security group rule create --dst-port 80 --protocol tcp --ingress default
 openstack security group rule create --dst-port 22 --protocol tcp --ingress default
 ```
-## Virtual machine images login info
-  * admin/openstack for the CirrosWeb image (WebServer and WebClient instances)
-  * admin/openstack for the NetMon image
 
 # Lab Steps
-## Netmon Network Ports
+## Network Ports
 
 Create two ports on the internal network to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
 ```bash
