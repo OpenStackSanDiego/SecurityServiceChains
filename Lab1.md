@@ -109,37 +109,20 @@ echo WEBSERVER_IP=$WEBSERVER_IP
 ssh cirros@${WEBSERVER_IP} 'while true; do echo -e "HTTP/1.0 200 OK\r\n\r\nWelcome to $(hostname)" | sudo nc -l -p 80 ; done&'
 ```
 
-* Validate that the web server process is running
+## Test Web Server
+
+From the WebClient, we'll hit the WebServer, using curl, to verify functionality of the webserver.
+
+* Run a curl from the WebClient to the WebServer
 ```bash
-curl $WEBSERVER_IP
-```
-
-## Initial web-server Test
-
-From the WebClient, we'll hit the WebServer to verify functionality of the webserver.
-
-* Log into WebClient via SSH
-```
-WEBCLIENT_IP=$(openstack port show port-client -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo WEBCLIENT_IP=$WEBCLIENT_IP
-ssh cirros@${WEBCLIENT_IP}
+echo WEBSERVER_IP=$WEBSERVER_IP
+ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
 ```
 
-* Verify that the client can connect to the web server using curl
-
-* Verify that the hostname of the web server is returned as the response from the remote Web Server
-
-## Startup Network Traffic Monitoring
-
-Next we'll introduce a virtual machine with some network monitoring tools installed (tcpdump and snort)
-
-* Log into NetMon server via SSH using the assigned floating IP 
-* Run a TCPDump to monitor for traffic to the client.
-
-```bash
-% sudo su -
-# tcpdump -i eth1 not port 22
-```
+* Verify that the the remove web server responds
 
 ## Service Chaining
 
@@ -151,54 +134,83 @@ WEBCLIENT_ID=`openstack port list --server WebClient -c ID -f value`
 echo $WEBCLIENT_ID
 ```
 
-* Create the Flow Classifier
+* Create the Flow Classifier for HTTP traffic between the WebClient and WebServer
 ```bash
-neutron flow-classifier-create \
-  --description "HTTP traffic from WebClient" \
-  --logical-source-port $WEBCLIENT_ID \
-  --ethertype IPv4 \
-  --protocol tcp \
-  --destination-port 80:80 FC1
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBCLIENT_IP=$WEBCLIENT_IP
+echo WEBSERVER_IP=$WEBSERVER_IP
+openstack sfc flow classifier create \
+    --ethertype IPv4 \
+    --source-ip-prefix ${WEBCLIENT_IP}/32 \
+    --destination-ip-prefix ${WEBSERVER_IP}/32 \
+    --protocol tcp \
+    --destination-port 80:80 \
+    --logical-source-port port-webclient \
+    FC-WebServer-HTTP
 ```
 
-* Create the Port Pair
+* Create the Port Pair, Port Pair Group, and Port Chain
 ```bash
-neutron port-pair-create \
-  --description "NetMon" \
-  --ingress ingress-1 \
-  --egress egress-1 PP1
+openstack sfc port pair create --ingress=port1-ingress --egress=port1-egress Netmon1-PortPair
+openstack sfc port pair group create --port-pair Netmon1-PortPair Netmon-PairGroup
+openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classifier FC-WebServer-HTTP PC1
 ```
 
-* Create the Port Pair Group
+## Network Traffic Monitoring - IP Forwarding
+
+* Startup a new SSH session to the controller
+* SSH into NetMon server via the admin interface
+
 ```bash
-neutron port-pair-group-create \
-  --port-pair PP1 PPG1
+TODO - setup routing
+NETMON1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+ssh centos@${NETMON1_ADMIN}
 ```
 
-* Create the Port Chain
+* Enabled Kernel IPForwarding on Netmon1
 ```bash
-neutron port-chain-create \
-  --port-pair-group PPG1 \
-  --flow-classifier FC1 PC1
+sudo echo 1 > /proc/sys/net/ipv4/ip_forward
 ```
 
-## Verify service chain functionality
-
-* Log into WebClient via SSH using the assigned floating IP
-* Generate traffic from the WebClient to the WebServer
+* Monitor Traffic through the Netmon1 service function
 ```bash
-$ curl 192.168.2.XXX
+sudo tcpdump -i eth1 port 80
 ```
-* Verify that the tcpdump monitor on NetMon saw the traffic being pushed through the service chain
+
+The next time traffic goes through the service chain, it will run through the Netmon service function and be monitored by the tcpdump process.
+
+## Service Chaining via Kernel IP Forwarding
+
+From the WebClient, we'll hit the WebServer, using curl, to generate traffic through the chain and the service function.
+
+* Run a curl from the WebClient to the WebServer
+```bash
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBCLIENT_IP=$WEBCLIENT_IP
+echo WEBSERVER_IP=$WEBSERVER_IP
+ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
+```
+
+* Verify that the the remove web server responds
+
+* Verify that the Netmon1 service function saw the traffic via tcpdump
+
+In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was routed from eth1 to eth2 by the kernel (via ipforwarding).
 
 
-## Bridge Traffic with tcpdump
+## Network Traffic Monitoring - IP Forwarding
 
 The current service chain brings traffic to the netmon instance but it doesn't travel through the vm. Bridging the ingress and egress ports allows traffic to flow through the vm and onto the web server. The bridge can then be used by tcpdump to monitor traffic as it flows through the vm.
 
-* Setup the Bridge on netmon
+* Disable Kernel IPForwarding on Netmon1
 ```bash
-yum install bridge-utils
+sudo echo 0 > /proc/sys/net/ipv4/ip_forward
+```
+
+* Setup the Bridge on Netmon1
+```bash
 brctl addbr br0
 brctl stp br0 on
 ifconfig eth1 0.0.0.0 down
@@ -210,55 +222,97 @@ ifconfig eth2 up
 ifconfig br0 up
 ```
 
-* Startup tcpdump on netmon using the bridge
+* Monitor Traffic through the Netmon1 service function
 ```bash
-tcpdump -i br0 port 80
+sudo tcpdump -i br0 port 80
 ```
 
-* Generate traffic from the WebClient to the WebServer
+The next time traffic goes through the service chain, it will run through the Netmon service function and be monitored by the tcpdump process.
+
+## Service Chaining via Bridged Service Function
+
+From the WebClient, we'll hit the WebServer, using curl, to generate traffic through the chain and the service function.
+
+* Run a curl from the WebClient to the WebServer
 ```bash
-$ curl 192.168.2.XXX
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBCLIENT_IP=$WEBCLIENT_IP
+echo WEBSERVER_IP=$WEBSERVER_IP
+ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
 ```
-* Verify that the tcpdump monitor on NetMon saw the traffic being pushed through the service chain
-* Verify that the curl command received a response back from the web server
+
+* Verify that the the remove web server responds
+
+* Verify that the Netmon1 service function saw the traffic via tcpdump
+
+In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was bridged from eth1 to eth2.
+
 
 ## Tear down the Bridge
 
-Remove the bridge so that an inline Snort bridge can be setup.
+Remove the bridge so that an inline Snort instance can be setup.
 
+* Stop the tcpdump on Netmon1 with ctrl-c
+
+* Disable bridge on Netmon1
 ```bash
-brctl delif br0 eth1
-brctl delif br0 eth2
-ifconfig br0 down
-brctl delbr br0
+sudo brctl delif br0 eth1
+sudo brctl delif br0 eth2
+sudo ifconfig br0 down
+sudo brctl delbr br0
 ```
 
-## Inline Bridge with Snort
+## Network Traffic Monitoring - Snort IDS Inline
+
+The current service chain brings traffic to the netmon instance but it doesn't travel through the vm. Bridging the ingress and egress ports allows traffic to flow through the vm and onto the web server. The bridge can then be used by tcpdump to monitor traffic as it flows through the vm.
 Next we'll be using Snort as an inline bridge to monitor and pass traffic.
 
-* Startup Snort inline on netmon
+* Disable Kernel IPForwarding on Netmon1
 ```bash
-snort -A console -Q -c snort.conf -Q -i eth1:eth2 -N
+sudo echo 0 > /proc/sys/net/ipv4/ip_forward
 ```
 
-* Generate traffic from the WebClient to the WebServer
+* Startup Snort inline on netmon1
 ```bash
-$ curl 192.168.2.XXX
+sudo snort -A console -Q -c snort.conf -Q -i eth1:eth2 -N
 ```
-* Verify that the Snort on NetMon saw the traffic
-* Verify that the curl command received a response back from the web server
+
+## Service Chaining via Snort Inline Function
+
+From the WebClient, we'll hit the WebServer, using curl, to generate traffic through the chain and the service function.
+
+* Run a curl from the WebClient to the WebServer
+```bash
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBCLIENT_IP=$WEBCLIENT_IP
+echo WEBSERVER_IP=$WEBSERVER_IP
+ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
+```
+
+* Verify that the the remove web server responds
+
+* Verify that the Netmon1 service function saw the traffic via snort
+
+In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was passed through the snort process which utilized eth1 and eth2 as the ingress and egress interfaces.
 
 ## Tear down the lab
 
-* Delete the NetMon virtual machine
+* Delete the NetMon1 virtual machine
+```bash
+openstack server delete NetMon1
+```
+
 * Delete the service chains from the controller
 ```bash
-neutron port-chain-delete PC1
-neutron port-pair-group-delete PPG1
-neutron port-pair-delete PP1
-neutron flow-classifier-delete FC1
+openstack sfc port pair delete Netmon1-PortPair
+openstack sfc port pair group delete Netmon-PairGroup
+openstack sfc port chain delete FC-WebServer-HTTP PC1
+openstack sfc flow classifier delete FC-WebServer-HTTP
 ```
 
 * The WebServer and WebClient will be used for future labs so leave them running
+* The ports can be saved for future labs so leave them runnings
 
 
