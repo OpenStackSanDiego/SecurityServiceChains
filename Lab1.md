@@ -116,7 +116,7 @@ WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "
 WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo WEBCLIENT_IP=$WEBCLIENT_IP
 echo WEBSERVER_IP=$WEBSERVER_IP
-ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
+ssh cirros@${WEBCLIENT_IP} curl -s ${WEBSERVER_IP}
 ```
 
 * Verify that the web server responds
