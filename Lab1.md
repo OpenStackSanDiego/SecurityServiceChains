@@ -125,13 +125,7 @@ ssh cirros@${WEBCLIENT_IP} curl -s ${WEBSERVER_IP}
 
 * Log into the physical OpenStack controller via SSH (IP address provided on the lab handout). The OpenStack credentials (keystonerc) will be loaded automatically when you login.
 
-* Record the assigned port (ID) for the WebClient. We'll need this to create the service chain.
-```bash
-WEBCLIENT_ID=`openstack port list --server WebClient -c ID -f value`
-echo $WEBCLIENT_ID
-```
-
-* Create the Flow Classifier for HTTP traffic between the WebClient and WebServer
+* Create the Flow Classifier for HTTP (tcp port 80) traffic from the WebClient to the WebServer.
 ```bash
 WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
