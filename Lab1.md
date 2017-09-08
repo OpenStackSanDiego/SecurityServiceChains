@@ -119,7 +119,7 @@ echo WEBSERVER_IP=$WEBSERVER_IP
 ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
 ```
 
-* Verify that the the remove web server responds
+* Verify that the web server responds
 
 ## Service Chaining
 
