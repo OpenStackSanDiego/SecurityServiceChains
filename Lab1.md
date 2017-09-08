@@ -306,9 +306,9 @@ openstack server delete NetMon1
 
 * Delete the service chains from the controller
 ```bash
-openstack sfc port pair delete Netmon1-PortPair
-openstack sfc port pair group delete Netmon-PairGroup
 openstack sfc port chain delete FC-WebServer-HTTP PC1
+openstack sfc port pair group delete Netmon-PairGroup
+openstack sfc port pair delete Netmon1-PortPair
 openstack sfc flow classifier delete FC-WebServer-HTTP
 ```
 
