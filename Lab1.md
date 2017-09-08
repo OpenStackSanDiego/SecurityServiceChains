@@ -143,7 +143,7 @@ openstack sfc flow classifier create \
 
 * Create the Port Pair, Port Pair Group, and Port Chain
 ```bash
-openstack sfc port pair create --ingress=port1-ingress --egress=port1-egress Netmon1-PortPair
+openstack sfc port pair create --ingress=port-ingress1 --egress=port-egress1 Netmon1-PortPair
 openstack sfc port pair group create --port-pair Netmon1-PortPair Netmon-PairGroup
 openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classifier FC-WebServer-HTTP PC1
 ```
