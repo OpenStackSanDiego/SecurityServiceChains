@@ -156,7 +156,7 @@ openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classi
 ```bash
 TODO - setup routing
 NETMON1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-ssh centos@${NETMON1_ADMIN}
+ssh centos@${NETMON1_ADMIN_IP}
 ```
 
 * Enabled Kernel IPForwarding on Netmon1
