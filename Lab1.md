@@ -41,12 +41,9 @@ openstack security group rule create --dst-port 22 --protocol tcp --ingress defa
 # Lab Steps
 ## Network Ports
 
-Create three ports for the network monitoring service function. One port will be for administrative purposes (port-admin1) to manage the virtual machine via an SSH session. The other two ports (port-ingress1 and port-egress1) will be the ingress and egress of network traffic in and out of the service function.
+Create three ports for the network monitoring service function. One port will be for administrative purposes (port-admin1) to manage the virtual machine via an SSH session. The other two ports (port-ingress1 and port-egress1) will be the ingress and egress of network traffic in and out of the service function. Create one port each for the web client and web server virtual machines. All of these ports will be on the internal network.
 
-Create one port each for the web client and web server virtual machines.
-
-All of these ports will be on the internal network.
-
+* Create the ports to be used by the VMs and service chains
 ```bash
 for port in port-admin1 port-ingress1 port-egress1 port-webclient port-webserver
 do
@@ -56,13 +53,13 @@ done
 
 ## Instances
 
-Startup the following three images and assign floating IPs to all. This can all be done via Horizon.
+Startup the following three images and assign floating IPs to all. This can all be done via Horizon or the OpenStack CLI.
 
 | Instance Name | Image         | Flavor  | Ports                                        | 
 | ------------- |:-------------:| -------:|---------------------------------------------:|
 | WebClient     | cirros        | m1.tiny | port-webclient                               |
 | WebServer     | cirros        | m1.tiny | port-webserver                               |
-| NetMon        | NetMon        | m1.small| port-admin1, port-ingress1, port-egress1     |
+| NetMon1       | NetMon        | m1.small| port-admin1, port-ingress1, port-egress1     |
 
 
 * Startup the NetMon VM
