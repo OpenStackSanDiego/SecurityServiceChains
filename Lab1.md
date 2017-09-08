@@ -79,8 +79,8 @@ openstack server create \
 openstack server create \
 	--image cirros \
 	--flavor m1.tiny \
- --nic port-id=port-webclient \
- --key-name default \
+	--nic port-id=port-webclient \
+	--key-name default \
 	webclient
 ```
 
@@ -89,8 +89,8 @@ openstack server create \
 openstack server create \
 	--image cirros \
 	--flavor m1.tiny \
- --nic port-id=port-webserver \
- --key-name default \
+        --nic port-id=port-webserver \
+	--key-name default \
 	webserver
 ```
 
