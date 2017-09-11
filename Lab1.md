@@ -209,7 +209,7 @@ EOF
 ```bash
 ssh centos@${NETMON1_ADMIN_IP}
 sudo brctl addbr br0
-sudo brctl stp br0 on
+sudo brctl stp br0 off
 sudo ifconfig eth1 0.0.0.0 down
 sudo ifconfig eth2 0.0.0.0 down
 sudo brctl addif br0 eth1
