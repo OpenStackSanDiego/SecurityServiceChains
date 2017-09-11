@@ -57,13 +57,16 @@ For simplicity sake, save the IP addresses assigned to each port to a shell vari
 
 * Save the assigned IP addresses to shell variables
 ```bash
-WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo WEBCLIENT_IP=$WEBCLIENT_IP
 
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo WEBSERVER_IP=$WEBSERVER_IP
 
-NETMON1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+NETMON1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo NETMON1_ADMIN_IP=$NETMON1_ADMIN_IP
 ```
 
