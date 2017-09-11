@@ -169,7 +169,7 @@ ssh centos@${NETMON1_ADMIN_IP}
 
 * Enabled Kernel IPForwarding on Netmon1
 ```bash
-sudo echo 1 > /proc/sys/net/ipv4/ip_forward
+ sudo /sbin/sysctl -w net.ipv4.ip_forward=1
 ```
 
 * Monitor Traffic through the Netmon1 service function
@@ -201,7 +201,7 @@ The current service chain brings traffic to the netmon instance but it doesn't t
 
 * Disable Kernel IPForwarding on Netmon1
 ```bash
-sudo echo 0 > /proc/sys/net/ipv4/ip_forward
+sudo /sbin/sysctl -w net.ipv4.ip_forward=0
 ```
 
 * Setup the Bridge on Netmon1
@@ -261,7 +261,7 @@ Next we'll be using Snort as an inline bridge to monitor and pass traffic.
 
 * Disable Kernel IPForwarding on Netmon1
 ```bash
-sudo echo 0 > /proc/sys/net/ipv4/ip_forward
+sudo /sbin/sysctl -w net.ipv4.ip_forward=0
 ```
 
 * Startup Snort inline on netmon1
