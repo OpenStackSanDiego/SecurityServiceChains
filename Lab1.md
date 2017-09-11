@@ -160,20 +160,17 @@ openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classi
 ## Network Traffic Monitoring - IP Forwarding
 
 * Startup a new SSH session to the controller
-* SSH into NetMon server via the admin interface
 
-```bash
-TODO - setup routing
-ssh centos@${NETMON1_ADMIN_IP}
-```
-
-* Enabled Kernel IPForwarding on Netmon1
-```bash
- sudo /sbin/sysctl -w net.ipv4.ip_forward=1
-```
+* Setup routes to/from webclient and webserver on NetMon
+ssh -T centos@${NETMON1_ADMIN_IP} <<EOF
+sudo ip route add $WEBCLIENT_IP dev eth1
+sudo ip route add $WEBSERVER_IP dev eth2
+sudo /sbin/sysctl -w net.ipv4.ip_forward=1
+EOF
 
 * Monitor Traffic through the Netmon1 service function
 ```bash
+ssh centos@${NETMON1_ADMIN_IP}
 sudo tcpdump -i eth1 port 80
 ```
 
@@ -201,11 +198,14 @@ The current service chain brings traffic to the netmon instance but it doesn't t
 
 * Disable Kernel IPForwarding on Netmon1
 ```bash
+ssh -T centos@${NETMON1_ADMIN_IP} <<EOF
 sudo /sbin/sysctl -w net.ipv4.ip_forward=0
+EOF
 ```
 
 * Setup the Bridge on Netmon1
 ```bash
+ssh centos@${NETMON1_ADMIN_IP}
 brctl addbr br0
 brctl stp br0 on
 ifconfig eth1 0.0.0.0 down
