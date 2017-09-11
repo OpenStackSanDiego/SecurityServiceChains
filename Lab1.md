@@ -214,6 +214,8 @@ sudo brctl addif br0 eth1
 sudo brctl addif br0 eth2
 sudo ifconfig eth1 up
 sudo ifconfig eth2 up
+sudo ip link set eth1 promisc on
+sudo ip link set eth2 promisc on
 sudo ifconfig br0 up
 ```
 
