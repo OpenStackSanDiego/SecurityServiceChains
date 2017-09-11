@@ -38,6 +38,20 @@ sudo cat >> $USER_HOME/.bashrc << EOF
 
 # OpenStack
 . ~/keystonerc
+
+# setup some variables for the lab
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips 2>/dev/null| \
+        grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBCLIENT_IP=$WEBCLIENT_IP
+
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips 2>/dev/null| \
+        grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBSERVER_IP=$WEBSERVER_IP
+
+NETMON2_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips 2>/dev/null| \
+        grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo NETMON2_ADMIN_IP=$NETMON2_ADMIN_IP
+
 EOF
 
 # copy over the answers
