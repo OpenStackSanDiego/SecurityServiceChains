@@ -116,7 +116,8 @@ We'll startup a small web server that simply responds back with a hostname strin
 
 * Startup a web server process
 ```bash
-ssh cirros@${WEBSERVER_IP} 'while true; do echo -e "HTTP/1.0 200 OK\r\n\r\nWelcome to $(hostname)" | sudo nc -l -p 80 ; done&'
+ssh cirros@${WEBSERVER_IP} \
+	'while true; do echo -e "HTTP/1.0 200 OK\r\n\r\nWelcome to $(hostname)" | sudo nc -l -p 80 ; done&'
 ```
 
 ## Test Web Server
