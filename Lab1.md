@@ -185,7 +185,7 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 
 * Run a curl from the WebClient to the WebServer
 ```bash
-ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
+ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 ```
 
 * Verify that the the remove web server responds
@@ -230,7 +230,7 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 
 * Run a curl from the WebClient to the WebServer
 ```bash
-ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
+ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 ```
 
 * Verify that the the remove web server responds
@@ -275,7 +275,7 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 
 * Run a curl from the WebClient to the WebServer
 ```bash
-ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
+ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 ```
 
 * Verify that the the remove web server responds
