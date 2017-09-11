@@ -206,15 +206,15 @@ EOF
 * Setup the Bridge on Netmon1
 ```bash
 ssh centos@${NETMON1_ADMIN_IP}
-brctl addbr br0
-brctl stp br0 on
-ifconfig eth1 0.0.0.0 down
-ifconfig eth2 0.0.0.0 down
-brctl addif br0 eth1
-brctl addif br0 eth2
-ifconfig eth1 up
-ifconfig eth2 up
-ifconfig br0 up
+sudo brctl addbr br0
+sudo brctl stp br0 on
+sudo ifconfig eth1 0.0.0.0 down
+sudo ifconfig eth2 0.0.0.0 down
+sudo brctl addif br0 eth1
+sudo brctl addif br0 eth2
+sudo ifconfig eth1 up
+sudo ifconfig eth2 up
+sudo ifconfig br0 up
 ```
 
 * Monitor Traffic through the Netmon1 service function
