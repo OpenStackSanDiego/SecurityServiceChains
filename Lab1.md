@@ -162,11 +162,13 @@ openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classi
 * Startup a new SSH session to the controller
 
 * Setup routes to/from webclient and webserver on NetMon
+```bash
 ssh -T centos@${NETMON1_ADMIN_IP} <<EOF
 sudo ip route add $WEBCLIENT_IP dev eth1
 sudo ip route add $WEBSERVER_IP dev eth2
 sudo /sbin/sysctl -w net.ipv4.ip_forward=1
 EOF
+```
 
 * Monitor Traffic through the Netmon1 service function
 ```bash
