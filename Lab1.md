@@ -51,6 +51,22 @@ do
 done
 ```
 
+## Save IP Address Assignments
+
+For simplicity sake, save the IP addresses assigned to each port to a shell variable to be used later in the lab.
+
+* Save the assigned IP addresses to shell variables
+```bash
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBCLIENT_IP=$WEBCLIENT_IP
+
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBSERVER_IP=$WEBSERVER_IP
+
+NETMON1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo NETMON1_ADMIN_IP=$NETMON1_ADMIN_IP
+```
+
 ## Instances
 
 Startup the following three images and assign floating IPs to all. This can all be done via Horizon or the OpenStack CLI.
@@ -100,9 +116,6 @@ We'll startup a small web server that simply responds back with a hostname strin
 
 * Startup a web server process
 ```bash
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo WEBSERVER_IP=$WEBSERVER_IP
-
 ssh cirros@${WEBSERVER_IP} 'while true; do echo -e "HTTP/1.0 200 OK\r\n\r\nWelcome to $(hostname)" | sudo nc -l -p 80 ; done&'
 ```
 
@@ -112,10 +125,6 @@ From the WebClient, we'll hit the WebServer, using curl, to verify functionality
 
 * Run a curl from the WebClient to the WebServer
 ```bash
-WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo WEBCLIENT_IP=$WEBCLIENT_IP
-echo WEBSERVER_IP=$WEBSERVER_IP
 ssh cirros@${WEBCLIENT_IP} curl -s ${WEBSERVER_IP}
 ```
 
@@ -127,10 +136,6 @@ ssh cirros@${WEBCLIENT_IP} curl -s ${WEBSERVER_IP}
 
 * Create the Flow Classifier for HTTP (tcp port 80) traffic from the WebClient to the WebServer.
 ```bash
-WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo WEBCLIENT_IP=$WEBCLIENT_IP
-echo WEBSERVER_IP=$WEBSERVER_IP
 openstack sfc flow classifier create \
     --ethertype IPv4 \
     --source-ip-prefix ${WEBCLIENT_IP}/32 \
@@ -155,7 +160,6 @@ openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classi
 
 ```bash
 TODO - setup routing
-NETMON1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 ssh centos@${NETMON1_ADMIN_IP}
 ```
 
@@ -177,10 +181,6 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 
 * Run a curl from the WebClient to the WebServer
 ```bash
-WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo WEBCLIENT_IP=$WEBCLIENT_IP
-echo WEBSERVER_IP=$WEBSERVER_IP
 ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
 ```
 
@@ -226,10 +226,6 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 
 * Run a curl from the WebClient to the WebServer
 ```bash
-WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo WEBCLIENT_IP=$WEBCLIENT_IP
-echo WEBSERVER_IP=$WEBSERVER_IP
 ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
 ```
 
@@ -275,10 +271,6 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 
 * Run a curl from the WebClient to the WebServer
 ```bash
-WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo WEBCLIENT_IP=$WEBCLIENT_IP
-echo WEBSERVER_IP=$WEBSERVER_IP
 ssh cirros@${WEBCLIENT_IP} curl@{$WEBSERVER_IP}
 ```
 
