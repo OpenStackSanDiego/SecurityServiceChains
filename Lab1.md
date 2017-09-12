@@ -270,7 +270,7 @@ sudo /sbin/sysctl -w net.ipv4.ip_forward=0
 
 * Startup Snort inline on netmon1
 ```bash
-sudo snort -A console -Q -c snort.conf -Q -i eth1:eth2 -N
+sudo snort -A console -c snort.conf -Q -i eth1:eth2 -N
 ```
 
 ## Service Chaining via Snort Inline Function
