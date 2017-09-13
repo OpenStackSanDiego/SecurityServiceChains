@@ -157,7 +157,7 @@ openstack sfc port pair group create --port-pair Netmon1-PortPair Netmon-PairGro
 openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classifier FC-WebServer-HTTP PC1
 ```
 
-## Network Traffic Monitoring - IP Forwarding
+## IP Forwarding Setup
 
 * Startup a new SSH session to the controller
 
@@ -170,7 +170,9 @@ sudo /sbin/sysctl -w net.ipv4.ip_forward=1
 EOF
 ```
 
-* Monitor Traffic through the Netmon1 service function
+## Monitoring with TCPDump
+
+* Monitor Traffic through the Netmon1 service function with TCPDump
 ```bash
 ssh centos@${NETMON1_ADMIN_IP}
 sudo tcpdump -i eth1 port 80
@@ -178,7 +180,7 @@ sudo tcpdump -i eth1 port 80
 
 The next time traffic goes through the service chain, it will run through the Netmon service function and be monitored by the tcpdump process.
 
-## Service Chaining via Kernel IP Forwarding
+## Generate traffic through Service Chain and IP Forwarding
 
 From the WebClient, we'll hit the WebServer, using curl, to generate traffic through the chain and the service function.
 
@@ -187,48 +189,23 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 ```
 
-* Verify that the the remove web server responds
+* Verify that the the remote web server responds
 
 * Verify that the Netmon1 service function saw the traffic via tcpdump
 
 In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was routed from eth1 to eth2 by the kernel (via ipforwarding).
 
+## Monitoring with Snort
 
-## Network Traffic Monitoring - IP Forwarding
-
-The current service chain brings traffic to the netmon instance but it doesn't travel through the vm. Bridging the ingress and egress ports allows traffic to flow through the vm and onto the web server. The bridge can then be used by tcpdump to monitor traffic as it flows through the vm.
-
-* Disable Kernel IPForwarding on Netmon1
-```bash
-ssh -T centos@${NETMON1_ADMIN_IP} <<EOF
-sudo /sbin/sysctl -w net.ipv4.ip_forward=0
-EOF
-```
-
-* Setup the Bridge on Netmon1
+* Monitor Traffic through the Netmon1 service function with Snort
 ```bash
 ssh centos@${NETMON1_ADMIN_IP}
-sudo brctl addbr br0
-sudo brctl stp br0 off
-sudo ifconfig eth1 0.0.0.0 down
-sudo ifconfig eth2 0.0.0.0 down
-sudo brctl addif br0 eth1
-sudo brctl addif br0 eth2
-sudo ifconfig eth1 up
-sudo ifconfig eth2 up
-sudo ip link set eth1 promisc on
-sudo ip link set eth2 promisc on
-sudo ifconfig br0 up
+sudo snort -A console -c snort-ids.conf -i eth1 -N
 ```
 
-* Monitor Traffic through the Netmon1 service function
-```bash
-sudo tcpdump -i br0 port 80
-```
+The next time traffic goes through the service chain, it will run through the Netmon service function and be monitored by the snort process.
 
-The next time traffic goes through the service chain, it will run through the Netmon service function and be monitored by the tcpdump process.
-
-## Service Chaining via Bridged Service Function
+## Generate traffic through Service Chain and IP Forwarding
 
 From the WebClient, we'll hit the WebServer, using curl, to generate traffic through the chain and the service function.
 
@@ -237,31 +214,17 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 ```
 
-* Verify that the the remove web server responds
+* Verify that the the remote web server responds
 
-* Verify that the Netmon1 service function saw the traffic via tcpdump
+* Verify that the Netmon1 service function saw the traffic via snort
 
-In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was bridged from eth1 to eth2.
+In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was routed from eth1 to eth2 by the kernel (via ipforwarding).
 
 
-## Tear down the Bridge
-
-Remove the bridge so that an inline Snort instance can be setup.
-
-* Stop the tcpdump on Netmon1 with ctrl-c
-
-* Disable bridge on Netmon1
-```bash
-sudo brctl delif br0 eth1
-sudo brctl delif br0 eth2
-sudo ifconfig br0 down
-sudo brctl delbr br0
-```
 
 ## Network Traffic Monitoring - Snort IDS Inline
 
-The current service chain brings traffic to the netmon instance but it doesn't travel through the vm. Bridging the ingress and egress ports allows traffic to flow through the vm and onto the web server. The bridge can then be used by tcpdump to monitor traffic as it flows through the vm.
-Next we'll be using Snort as an inline bridge to monitor and pass traffic.
+Next we'll be using Snort inline to block traffic. IP Forwarding will be turned off so the kernel no longer routes the packets. Instead, packets will go into the Snort process which will determine what packets to forward.
 
 * Disable Kernel IPForwarding on Netmon1
 ```bash
@@ -270,21 +233,19 @@ sudo /sbin/sysctl -w net.ipv4.ip_forward=0
 
 * Startup Snort inline on netmon1
 ```bash
-sudo snort -A console -c snort.conf -Q -i eth1:eth2 -N
+sudo snort -A console -c snort-ips.conf -Q -i eth1:eth2 -N
 ```
 
 ## Service Chaining via Snort Inline Function
 
-From the WebClient, we'll hit the WebServer, using curl, to generate traffic through the chain and the service function.
+From the WebClient, we'll hit the WebServer, using curl, to generate traffic through the chain and the service function. The traffic will be logged and blocked by Snort.
 
 * Run a curl from the WebClient to the WebServer
 ```bash
 ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 ```
 
-* Verify that the the remove web server responds
-
-* Verify that the Netmon1 service function saw the traffic via snort
+* Verify that the Netmon1 service function saw and blocked the traffic via snort
 
 In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was passed through the snort process which utilized eth1 and eth2 as the ingress and egress interfaces.
 
