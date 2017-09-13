@@ -268,7 +268,29 @@ openstack sfc port pair delete Netmon1-PortPair
 openstack sfc flow classifier delete FC-WebServer-HTTP
 ```
 
-* The WebServer and WebClient will be used for future labs so leave them running
-* The ports can be saved for future labs so leave them runnings
+* Delete the virtual machines
+```bash
+openstack server delete webclient
+openstack server delete webserver
+openstack server delete NetMon1
+```
+
+* Delete the assigned ports
+```bash
+for port in port-admin1 port-ingress1 port-egress1 port-webclient port-webserver
+do
+    openstack port delete "${port}"
+done
+```
+
+* Unassign the instance variables
+```bash
+WEBCLIENT_IP=NOT_ASSIGNED
+WEBSERVER_IP=NOT_ASSIGNED
+NETMON1_ADMIN_IP=NOT_ASSIGNED
+```
+
+
+
 
 
