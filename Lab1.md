@@ -3,13 +3,13 @@
 
 # Overview
 
-In this first exercise we'll be adding a rule to move traffic through a virtual machine configured with the network monitoring tool TCPDump. This exercise walks through the basics of setting up your first service chain and service functions. The service functions will be setup in three different modes (IP forwarded, bridged, and snort IDS inline).
+In this first exercise we'll be adding a rule to move traffic through a virtual machine configured with the network monitoring tool TCPDump. This exercise walks through the basics of setting up your first service chain and service functions. The service functions will be setup in three different modes (IP forwarded, snort IDS, and snort IPS inline). IDS, intrusion detection system, monitors traffic while IPS, intrusion prevention system, blocks traffic.
 
 # Goals
 
   * Monitor inbound web (HTTP) traffic from a web client to web server
   * Setup a service chain to monitor the packet flows
-  * Setup a service function in each of IP forwarded, bridged, and inline configurations
+  * Setup a service function in each of IP forwarded, IDS, and IPS configurations
 
 # Prereq
 
