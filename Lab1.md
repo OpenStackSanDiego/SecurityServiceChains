@@ -200,7 +200,7 @@ In this scenarion, traffic traversed through the service function via the servic
 * Monitor Traffic through the Netmon1 service function with Snort
 ```bash
 ssh centos@${NETMON1_ADMIN_IP}
-sudo snort -A console -c snort-ids.conf -i eth1 -N
+sudo snort -A console -c /etc/snort/snort-ids.conf -i eth1 -N
 ```
 
 The next time traffic goes through the service chain, it will run through the Netmon service function and be monitored by the snort process.
