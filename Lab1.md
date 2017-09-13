@@ -134,6 +134,18 @@ ssh cirros@${WEBCLIENT_IP} curl -s ${WEBSERVER_IP}
 
 * Verify that the web server responds
 
+
+## IP Forwarding and Routing Setup
+
+* Setup routes to/from webclient and webserver on netmon
+```bash
+ssh -T centos@${NETMON1_ADMIN_IP} <<EOF
+sudo ip route add $WEBCLIENT_IP dev eth1
+sudo ip route add $WEBSERVER_IP dev eth2
+sudo /sbin/sysctl -w net.ipv4.ip_forward=1
+EOF
+```
+
 ## Service Chaining
 
 * Log into the physical OpenStack controller via SSH (IP address provided on the lab handout). The OpenStack credentials (keystonerc) will be loaded automatically when you login.
@@ -155,19 +167,6 @@ openstack sfc flow classifier create \
 openstack sfc port pair create --ingress=port-ingress1 --egress=port-egress1 Netmon1-PortPair
 openstack sfc port pair group create --port-pair Netmon1-PortPair Netmon-PairGroup
 openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classifier FC-WebServer-HTTP PC1
-```
-
-## IP Forwarding Setup
-
-* Startup a new SSH session to the controller
-
-* Setup routes to/from webclient and webserver on netmon
-```bash
-ssh -T centos@${NETMON1_ADMIN_IP} <<EOF
-sudo ip route add $WEBCLIENT_IP dev eth1
-sudo ip route add $WEBSERVER_IP dev eth2
-sudo /sbin/sysctl -w net.ipv4.ip_forward=1
-EOF
 ```
 
 ## Monitoring with TCPDump
