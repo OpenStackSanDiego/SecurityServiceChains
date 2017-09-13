@@ -76,9 +76,9 @@ Startup the following three images and assign floating IPs to all. This can all 
 
 | Instance Name | Image         | Flavor  | Ports                                        | 
 | ------------- |:-------------:| -------:|---------------------------------------------:|
-| WebClient     | cirros        | m1.tiny | port-webclient                               |
-| WebServer     | cirros        | m1.tiny | port-webserver                               |
-| NetMon1       | NetMon        | m1.small| port-admin1, port-ingress1, port-egress1     |
+| webclient     | cirros        | m1.tiny | port-webclient                               |
+| webserver     | cirros        | m1.tiny | port-webserver                               |
+| netmon1       | NetMon        | m1.small| port-admin1, port-ingress1, port-egress1     |
 
 
 * Startup the NetMon VM
@@ -90,7 +90,7 @@ openstack server create \
 	--nic port-id=port-ingress1 \
 	--nic port-id=port-egress1 \
 	--key-name default \
-	NetMon1
+	netmon1
 ```
 
 * Startup the Web Client VM
@@ -161,7 +161,7 @@ openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classi
 
 * Startup a new SSH session to the controller
 
-* Setup routes to/from webclient and webserver on NetMon
+* Setup routes to/from webclient and webserver on netmon
 ```bash
 ssh -T centos@${NETMON1_ADMIN_IP} <<EOF
 sudo ip route add $WEBCLIENT_IP dev eth1
@@ -255,11 +255,6 @@ In this scenarion, traffic traversed through the service function via the servic
 
 ## Tear down the lab
 
-* Delete the NetMon1 virtual machine
-```bash
-openstack server delete NetMon1
-```
-
 * Delete the service chains from the controller
 ```bash
 openstack sfc port chain delete PC1
@@ -272,7 +267,7 @@ openstack sfc flow classifier delete FC-WebServer-HTTP
 ```bash
 openstack server delete webclient
 openstack server delete webserver
-openstack server delete NetMon1
+openstack server delete netmon1
 ```
 
 * Delete the assigned ports
