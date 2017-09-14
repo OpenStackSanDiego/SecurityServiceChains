@@ -45,10 +45,14 @@ Startup the following ports and images using Horizon or the OpenStack CLI.
 
 All ports should be on the internal network.
 
-## Monitor for malicious traffic
+## Create a flow classifier to monitor all traffic
 
+* Create a flow classifier that monitors all traffic
+* Hint: removing "--destination-port" from a flow classifier will cover all ports
+* Hint: 0.0.0.0/0 can be used as a wildcard IP address
 * Utilize NetMon virtual machine(s) to monitor the traffic
 * Utilize tcpdump and/or snort to monitor the traffic
+* Hint: "sudo tcpdump -i eth1" will view all traffic from the chain 
 * "whois" will help translate remote IP addresses to services
 * Create a service chain to monitor traffic from the IoT devices
 * Traffic can be monitored from the individual IoT device ports or via the gateway port
