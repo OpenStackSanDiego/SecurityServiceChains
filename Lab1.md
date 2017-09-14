@@ -225,17 +225,10 @@ In this scenarion, traffic traversed through the service function via the servic
 
 Next we'll be using Snort inline to block traffic. IP Forwarding will be turned off so the kernel no longer routes the packets. Instead, packets will go into the Snort process which will determine what packets to forward.
 
-* Disable Kernel IPForwarding on Netmon1
+* Disable Kernel IPForwarding & startup Snort inline on netmon1
 ```bash
 ssh centos@${NETMON1_ADMIN_IP}
-sudo ip address replace 0.0.0.0 dev eth1
-sudo ip address replace 0.0.0.0 dev eth2
 sudo /sbin/sysctl -w net.ipv4.ip_forward=0
-```
-
-* Startup Snort inline on netmon1
-```bash
-ssh centos@${NETMON1_ADMIN_IP}
 sudo snort -A console -c /etc/snort/snort-ips.conf -Q -i eth1:eth2 -N
 ```
 
