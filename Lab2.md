@@ -31,7 +31,7 @@ openstack security group rule create --dst-port 22 --protocol tcp --ingress defa
 # Lab Steps
 ## Network Monitoring Ports
 
-Create six ports to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machines. Create ports for the web client and web server virtual machines. See Lab #1 for the CLI syntax.
+Create six ports to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machines. Create ports for the web client and web server virtual machines. See Lab #1 for the CLI syntax. Hint: openstack port create --network internal port-name....
 
 | Port              | Network       | Purpose                             |
 | ------------------|:--------------|:------------------------------------|
