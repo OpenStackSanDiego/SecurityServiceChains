@@ -116,6 +116,16 @@ openstack sfc port pair group create --port-pair Netmon1-PortPair Netmon1-PairGr
 openstack sfc port pair group create --port-pair Netmon2-PortPair Netmon2-PairGroup
 openstack sfc port chain create --port-pair-group Netmon1-PairGroup --port-pair-group Netmon2-PairGroup --flow-classifier FC-WebServer-HTTP PC1
 ```
+
+## Enable Monitoring/IDS Functions
+
+See Lab #1 for the commands to startup TCPDump or Snort.  Startup either TCPDump or Snort IDS (not IPS) on each of netmon1 and netmon2. Only run one function on each monitor.
+
+* Monitor traffic through the netmon1 service function with TCPDump or Snort IDS
+* Monitor traffic through the netmon2 service function with TCPDump or Snort IDS
+ 
+
+
 ## Tear down the lab
 
 * Delete the NetMon virtual machines
