@@ -1,3 +1,8 @@
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root (sudo)"
+  exit
+fi
+
 source ~/keystonerc_admin
 
 for i in 16;
@@ -10,17 +15,17 @@ USER_HOME=`eval echo "~$USER"`
 echo $PROJECT $USER $USER_HOME
 
 # userXX/openstack
-sudo adduser -p 42ZTHaRqaaYvI $USER -G wheel
+adduser -p 42ZTHaRqaaYvI $USER -G wheel
 USER_HOME=`getent passwd $USER |  cut -f6 -d:`
 
-sudo cp -R ~root/.ssh $USER_HOME
-sudo chown -R $USER.$USER $USER_HOME/.ssh/
-sudo chmod 700 $USER_HOME/.ssh/
+cp -R ~root/.ssh $USER_HOME
+chown -R $USER.$USER $USER_HOME/.ssh/
+chmod 700 $USER_HOME/.ssh/
 
 IP=`hostname -I | cut -d' ' -f 1`
 
 # create a keystone credential file for the new user
-sudo cat >> $USER_HOME/keystonerc << EOF
+cat >> $USER_HOME/keystonerc << EOF
 unset OS_SERVICE_TOKEN
 export OS_USERNAME=$USER
 export OS_PASSWORD=openstack
@@ -34,7 +39,7 @@ export OS_IDENTITY_API_VERSION=3
 EOF
 
 # have the keystone credentials read upon login of the new user
-sudo cat >> $USER_HOME/.bash_profile << EOF
+cat >> $USER_HOME/.bash_profile << EOF
 
 # OpenStack
 . ~/keystonerc
@@ -60,7 +65,7 @@ echo NETMON2_ADMIN_IP=$NETMON2_ADMIN_IP
 EOF
 
 # copy over the answers
-sudo wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab1-Answers.sh -O $USER_HOME/Lab1-Answers.sh
+wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab1-Answers.sh -O $USER_HOME/Lab1-Answers.sh
 
 
 PROJECT_ID=`openstack project create $PROJECT -f value -c id`
@@ -105,6 +110,6 @@ if [ "${NET_GATEWAY}" = "" ]; then
   sleep 5
   NET_GATEWAY=$(sudo ip netns exec qrouter-"${ROUTER_ID}" ip -4 route get 8.8.8.8 | head -n1 | awk '{print $7}')
 fi
-sudo ip route replace "${INTERNAL_SUBNET}" via $NET_GATEWAY
+ip route replace "${INTERNAL_SUBNET}" via $NET_GATEWAY
 
 done
