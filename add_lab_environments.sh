@@ -45,20 +45,20 @@ cat >> $USER_HOME/.bash_profile << EOF
 . ~/keystonerc
 
 # setup some variables for the lab
-export WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips 2>/dev/null| \
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips 2>/dev/null| \
         grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo WEBCLIENT_IP=$WEBCLIENT_IP
 
-export WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips 2>/dev/null| \
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips 2>/dev/null| \
         grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo WEBSERVER_IP=$WEBSERVER_IP
 
 
-export NETMON1_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips 2>/dev/null| \
+NETMON1_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips 2>/dev/null| \
         grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo NETMON1_ADMIN_IP=$NETMON2_ADMIN_IP
 
-export NETMON2_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips 2>/dev/null| \
+NETMON2_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips 2>/dev/null| \
         grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo NETMON2_ADMIN_IP=$NETMON2_ADMIN_IP
 
