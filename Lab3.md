@@ -38,8 +38,8 @@ Startup the following ports and images using Horizon or the OpenStack CLI.
 
 | Instance Name | Image           | Flavor  | Ports                                        | 
 | ------------- |:---------------:| -------:|---------------------------------------------:|
-| iot1          | IoT-malicious  | m1.tiny | port-iot1                                    |
-| iot2          | IoT-malicious  | m1.tiny | port-iot2                                    |
+| iot1          | IoT-malicious  | m1.small | port-iot1                                    |
+| iot2          | IoT-malicious  | m1.small | port-iot2                                    |
 | netmon1       | NetMon          | m1.small| port-admin1, port-ingress1, port-egress1     |
 | netmon2       | NetMon          | m1.small| port-admin2, port-ingress2, port-egress2     |
 
