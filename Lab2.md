@@ -3,12 +3,15 @@
 
 # Overview
 
+In this exercise we'll be building a more complex service chain sending traffic through two service functions chained together. This includes setting up the service chain and the virtual security functions. 
+
 
 # Goals
 
+  * Build two virtual security function in virtual machines
+  * Setup a service chain incorporating both virtual security functions
   * Monitor inbound web (HTTP) traffic from the client to web server
   * Block inbound web (HTTP) traffic from the client to the web server
-  * Utilize service chains to monitor and block the packet flows in a single flow
 
 # Prereq
 
@@ -24,131 +27,95 @@
 openstack security group rule create --dst-port 80 --protocol tcp --ingress default
 openstack security group rule create --dst-port 22 --protocol tcp --ingress default
 ```
-## Virtual machine images login info
-  * admin/openstack for the CirrosWeb image (WebServer and WebClient instances)
-  * admin/openstack for the NetMon image
 
 # Lab Steps
 ## Network Monitoring Ports
 
-Create four ports to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
-```bash
-$ openstack port create --network service ingres-1
-$ openstack port create --network service egress-1
-$ openstack port create --network service ingres-2
-$ openstack port create --network service egress-2
-```
+Create six ports to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machines. Create ports for the web client and web server virtual machines. See Lab #1 for the CLI syntax.
+
+| Port              | Network       | Purpose                             |
+| ------------------|:--------------|:------------------------------------|
+| port-ingress1     | internal      | service function 1 traffic ingress  |
+| port-egress1      | internal      | service function 1 traffic egress   |
+| port-admin1       | internal      | service function 1 management       |
+| port-ingress2     | internal      | service function 2 traffic ingress  |
+| port-egress2      | internal      | service function 2 traffic egress   |
+| port-admin2       | internal      | service function 2 management       |
+| port-webclient    | internal      | traffic source                      |
+| port-webserver    | internal      | traffic consumer                    |
+
+
+
+
 ## Instances
 
-Startup the following three images and assign floating IPs to all. This can all be done via Horizon.
+Startup the following five images. This can be done via Horizon or the OpenStack CLI. See Lab #1 for the CLI syntax.
 
-| Instance Name | Image         | Flavor  | Network(s)      | Floating IP | Additional Ports            |
-| ------------- |:-------------:| -------:|----------------:|------------:|-------------------------------------------------------:|
-| WebClient     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
-| WebServer     | CirrosWeb     | m1.tiny | internal        |  assign     | none                                                   |
-| NetMon1       | NetMon        | m1.small| internal        |  assign     | ingress-1, egress-1                         | 
-| NetMon2       | NetMon        | m1.small| internal        |  assign     | ingress-2, egress-2                         | 
+| Instance Name | Image         | Flavor  | Ports                                        | 
+| ------------- |:-------------:| -------:|---------------------------------------------:|
+| webclient     | cirros        | m1.tiny | port-webclient                               |
+| webserver     | cirros        | m1.tiny | port-webserver                               |
+| netmon1       | NetMon        | m1.small| port-admin1, port-ingress1, port-egress1     |
+| netmon2       | NetMon        | m1.small| port-admin2, port-ingress2, port-egress2     |
 
-Ensure floating IPs are assigned to all instances.
+## Save IP Address Assignments
+
+For simplicity sake, save the IP addresses assigned to each port to a shell variable to be used later in the lab.
+
+* Save the assigned IP addresses to shell variables
+```bash
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBCLIENT_IP=$WEBCLIENT_IP
+
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo WEBSERVER_IP=$WEBSERVER_IP
+
+NETMON1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo NETMON1_ADMIN_IP=$NETMON1_ADMIN_IP
+
+
+NETMON2_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo NETMON2_ADMIN_IP=$NETMON2_ADMIN_IP
+```
 
 ## Startup the Web Server
 
-We'll startup a small web server that simply responds back with a hostname string. This is simply to simulate a web server and to give us some traffic to monitor
-* Log into WebServer via SSH using the assigned floating IP
-* su to root to gain superuser privileges
-```bash
-$ sudo su -
-```
-* Startup the web server via the command "hostname-webserver.sh"
-```bash
-# ./hostname-webserver.sh
-```
+We'll startup a small web server that simply responds back with a hostname string. This is simply to simulate a web server and to give us some traffic to monitor. See lab #1 for the CLI syntax.
 
-## Initial web-server Test
+## IP Forwarding and Routing Setup
 
-From the WebClient, we'll hit the WebServer to verify functionality of the webserver.
+* Setup routes to/from webclient and webserver on netmon1 and netmon2
 
-* Log into WebClient via SSH using the assigned floating IP
-* Verify that the client can connect to the web server on the WebServer private IP
-```bash
-$ curl 192.168.2.XXX
-```
-* Verify that the hostname of the web server is returned as the response from the remote Web Server
-
-## Startup Network Traffic Monitoring on NetMon1
-
-The first NetMon instance will be used to run tcpdump.
-
-* Log into NetMon server via SSH using the assigned floating IP 
-* Run a TCPDump to monitor for traffic to the client.
-
-```bash
-% sudo su -
-# tcpdump -i eth1 not port 22
-```
-
-## Startup Snort on NetMon2
-
-The second NetMon instance will be used to run Snort.
-
-* Log into NetMon server via SSH using the assigned floating IP 
-* Run a Snort to monitor for traffic to the client.
-
-```bash
-% sudo su -
-# snort -i eth1 not port 22
-```
+See Lab #1 for the CLI syntax. Be sure to turn on IP Forwarding and setup the routes on both virtual machines netmon1 and netmon2.
 
 ## Service Chaining
 
-* Log into the physical OpenStack controller via SSH (IP address provided on the lab handout). The OpenStack credentials (keystonerc) will be loaded automatically when you login.
+Create a new service chain that sends HTTP traffic from the web client to the web server through both netmon1 and netmon2.
 
-* Record the assigned port (ID) for the WebClient. We'll need this to create the service chain.
+* Create the Flow Classifier for HTTP (tcp port 80) traffic from the WebClient to the WebServer.
 ```bash
-WEBCLIENT_ID=`openstack port list --server WebClient -c ID -f value`
-echo $WEBCLIENT_ID
+openstack sfc flow classifier create \
+    --ethertype IPv4 \
+    --source-ip-prefix ${WEBCLIENT_IP}/32 \
+    --destination-ip-prefix ${WEBSERVER_IP}/32 \
+    --protocol tcp \
+    --destination-port 80:80 \
+    --logical-source-port port-webclient \
+    FC-WebServer-HTTP
 ```
 
-* Create the Flow Classifier
+* Create the Port Pair, Port Pair Group, and Port Chain
 ```bash
-neutron flow-classifier-create \
-  --description "HTTP traffic from WebClient" \
-  --logical-source-port $WEBCLIENT_ID \
-  --ethertype IPv4 \
-  --protocol tcp \
-  --destination-port 80:80 WebClientFC
+openstack sfc port pair create --ingress=port-ingress1 --egress=port-egress1 Netmon1-PortPair
+openstack sfc port pair create --ingress=port-ingress2 --egress=port-egress2 Netmon2-PortPair
+openstack sfc port pair group create --port-pair Netmon1-PortPair Netmon1-PairGroup
+openstack sfc port pair group create --port-pair Netmon2-PortPair Netmon2-PairGroup
+openstack sfc port chain create --port-pair-group Netmon1-PairGroup --port-pair-group Netmon2-PairGroup --flow-classifier FC-WebServer-HTTP PC1
 ```
-
-* Create two port pairs once each for ingress-1/egress-1 (PP1) and ingress-2/egress-2 (PP2). See Lab 1 for syntax.
-
-* Create the Port Pair Group (PPG2)
-```bash
-neutron port-pair-group-create \
-  --port-pair PP1 --port-pair PP2 PPG1
-```
-
-* Create the Port Chain
-```bash
-neutron port-chain-create \
-  --port-pair-group PPG1 \
-  --flow-classifier WebClientFC PC1
-```
-
-## Verify service chain functionality
-
-* Log into WebClient via SSH using the assigned floating IP
-* Generate traffic from the WebClient to the WebServer
-```bash
-$ curl 192.168.2.XXX
-```
-* Verify that the tcpdump monitor on NetMon1 saw the traffic being pushed through the service chain
-* Verify that snort on the NetMon2 saw the traffic as well.
-
-## Block the traffic
-
-* Update the snort command to block the web traffic
-* Verify that the webclient can no longer access the web server
-
 ## Tear down the lab
 
 * Delete the NetMon virtual machines
