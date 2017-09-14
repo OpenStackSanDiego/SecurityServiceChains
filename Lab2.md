@@ -123,11 +123,19 @@ See Lab #1 for the commands to startup TCPDump or Snort.  Startup either TCPDump
 
 * Monitor traffic through the netmon1 service function with TCPDump or Snort IDS
 * Monitor traffic through the netmon2 service function with TCPDump or Snort IDS
- 
 
+## Generate traffic through Service Chain
+
+From the WebClient, we'll hit the WebServer, using curl, to generate traffic through the chain and the service function.
+
+* Run a curl from the WebClient to the WebServer
+
+* Verify that the the remote web server responds
+
+* Verify that the netmon1 and netmon2 service functions saw the traffic via TCPDump or Snort
 
 ## Tear down the lab
 
-* Delete the NetMon virtual machines
-* Delete the service chains (pair groups, port pairs, and flow classifier)
-* Delete the WebClient virtual machines
+* Delete the webclient, webserver, netmon1 and netmon2 virtual machines
+* Delete the service chain components
+* Delete the network ports
