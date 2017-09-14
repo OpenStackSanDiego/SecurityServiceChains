@@ -34,21 +34,26 @@ export OS_IDENTITY_API_VERSION=3
 EOF
 
 # have the keystone credentials read upon login of the new user
-sudo cat >> $USER_HOME/.bashrc << EOF
+sudo cat >> $USER_HOME/.bash_profile << EOF
 
 # OpenStack
 . ~/keystonerc
 
 # setup some variables for the lab
-WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips 2>/dev/null| \
+export WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips 2>/dev/null| \
         grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo WEBCLIENT_IP=$WEBCLIENT_IP
 
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips 2>/dev/null| \
+export WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips 2>/dev/null| \
         grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo WEBSERVER_IP=$WEBSERVER_IP
 
-NETMON2_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips 2>/dev/null| \
+
+export NETMON1_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips 2>/dev/null| \
+        grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+echo NETMON1_ADMIN_IP=$NETMON2_ADMIN_IP
+
+export NETMON2_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips 2>/dev/null| \
         grep "ip_address='[0-9]*\." | cut -d"'" -f2)
 echo NETMON2_ADMIN_IP=$NETMON2_ADMIN_IP
 
