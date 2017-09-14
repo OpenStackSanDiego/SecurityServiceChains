@@ -5,7 +5,7 @@
 
 A number of malicous IoT (Internet of Things) devices are running on your network! It's your job to analyze the traffic to determine how it is communicating and block the traffic.
 
-Each IoT device is communicating with a "Command and Control" server at least every 60 seconds using either TDP or UDP. Using TCPDump and/or Snort, determine what remote IP(s) the device is communicating and block that IP. Utilize a second NetMon to verify that the traffic is being blocked.
+Each IoT device is communicating with a "Command and Control" server at least every 60 seconds IP networking. Using TCPDump and/or Snort, determine what remote IP(s) the device is communicating and block that IP. Utilize a second NetMon to verify that the traffic is being blocked.
 
 No login credentials are provided for the IoT box. You should consider it a black box where you can only examine traffic in/out of the virtual machine.
 
@@ -29,33 +29,21 @@ No login credentials are provided for the IoT box. You should consider it a blac
 openstack security group rule create --dst-port 80 --protocol tcp --ingress default
 openstack security group rule create --dst-port 22 --protocol tcp --ingress default
 ```
-## Virtual machine images login info
-  * admin/openstack for the CirrosWeb image (WebServer and WebClient instances)
-  * admin/openstack for the NetMon image
-  * No access to the "IoT-Malicious" image is provided
 
 # Lab Steps
-## Network Monitoring Ports
 
-Create four ports on the service network to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machine (netmon).
-```bash
-$ openstack port create --network service ingres-1
-$ openstack port create --network service egress-1
-$ openstack port create --network service ingres-2
-$ openstack port create --network service egress-2
-```
-## Instances
+## Ports and Instances
 
-Startup the following three images and assign floating IPs to all. This can all be done via Horizon.
+Startup the following ports and images using Horizon or the OpenStack CLI.
 
-| Instance Name | Image         | Flavor  | Network(s)      | Floating IP | Additional Ports            |
-| ------------- |:-------------:| -------:|----------------:|------------:|----------------------------:|
-| IoT-1         | IoT-malicious | m1.small | internal       | none        |                             |
-| IoT-2         | IoT-malicious | m1.small | internal       | none        |                             |
-| NetMon1       | NetMon        | m1.small | internal       |  assign     | ingress-1, egress-1         | 
-| NetMon2       | NetMon        | m1.small | internal       |  assign     | ingress-2, egress-2         | 
+| Instance Name | Image           | Flavor  | Ports                                        | 
+| ------------- |:---------------:| -------:|---------------------------------------------:|
+| iot1          | IoT-malicious  | m1.tiny | port-iot1                                    |
+| iot2          | IoT-malicious  | m1.tiny | port-iot2                                    |
+| netmon1       | NetMon          | m1.small| port-admin1, port-ingress1, port-egress1     |
+| netmon2       | NetMon          | m1.small| port-admin2, port-ingress2, port-egress2     |
 
-Ensure floating IPs are assigned to the NetMon instances.
+All ports should be on the internal network.
 
 ## Monitor for malicious traffic
 
