@@ -38,34 +38,34 @@ Startup the following ports and images using Horizon or the OpenStack CLI.
 
 | Instance Name | Image           | Flavor  | Ports                                        | 
 | ------------- |:---------------:| -------:|---------------------------------------------:|
-| iot1          | IoT-malicious  | m1.small | port-iot1                                    |
-| iot2          | IoT-malicious  | m1.small | port-iot2                                    |
+| iot1          | IoT-malicious   | m1.small | port-iot1                                    |
+| iot2          | IoT-malicious   | m1.small | port-iot2                                    |
 | netmon1       | NetMon          | m1.small| port-admin1, port-ingress1, port-egress1     |
 | netmon2       | NetMon          | m1.small| port-admin2, port-ingress2, port-egress2     |
 
 All ports should be on the internal network.
 
 ## Create a flow classifier to monitor all traffic
-
 * Create a flow classifier that monitors all traffic
 * Hint: removing "--destination-port" from a flow classifier will cover all ports
 * Hint: 0.0.0.0/0 can be used as a wildcard IP address
 * Utilize NetMon virtual machine(s) to monitor the traffic
-* Utilize tcpdump and/or snort to monitor the traffic
-* Hint: "sudo tcpdump -i eth1" will view all traffic from the chain 
-* "whois" will help translate remote IP addresses to services
-* Create a service chain to monitor traffic from the IoT devices
-* Traffic can be monitored from the individual IoT device ports or via the gateway port
+
+## Create a chain to netmon1
+* Chain traffic through the single netmon1 function
+
+## Identify using tcpdump
+* Hint: "sudo tcpdump -i eth1" will view all traffic from the chain
+* Identify the malicious traffic ports and destinations
 
 ## Block the malicious traffic
-
-* Update the NetMon virtual machine(s) to block the traffic
-* Build a snort command to block the traffic from the malicious IoT devices
-* Update/Replace the service chain as needed
-* Verify that the traffic is no longer being sent over the Internet
+* Update the flow classifier to only catch the malicious traffic by port
+* Update the snort rules to block the traffic "/etc/snort/rules/snort-ips.rules"
+* Disable IP forwarding on netmon1 before starting snort-ips
+* Startup snort-ips and verify traffic is being dropped
+* Run tcpdump on the egress port to validate traffic is being dropped
 
 ## Tear down the lab
 
-* Delete the NetMon virtual machines
+* Delete the netmon and IoT virtual machines
 * Delete the service chains (pair groups, port pairs, and flow classifier)
-* Delete the IoT-malicious virtual machines
