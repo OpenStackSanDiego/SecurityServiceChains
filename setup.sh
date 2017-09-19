@@ -7,7 +7,6 @@ yum -y update
 time packstack                                  \
         --allinone                              \
         --os-cinder-install=n                   \
-        --nagios-install=n                      \
         --os-ceilometer-install=n               \
         --os-neutron-ml2-type-drivers=flat,vxlan \
         --os-heat-install=y
