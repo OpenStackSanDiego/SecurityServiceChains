@@ -178,9 +178,11 @@ openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classi
 
 From the NetMon1 machine, we'll monitor the traffic going through the service chain.
 
-* Startup a <bold>new</bold> SSH session to the controller
+* Startup a **new** SSH session to the controller
 
-* Use this new session to run TCPDump from netmon1
+* Setup the WEBCLIENT_IP, WEBSERVER_IP, and NETMON1_ADMIN_IP shell variables (see above)
+
+* Use this **new** session to run TCPDump from netmon1
 ```bash
 ssh centos@${NETMON1_ADMIN_IP}
 sudo tcpdump -i eth1 port 80
