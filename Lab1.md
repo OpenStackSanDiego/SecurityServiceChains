@@ -26,6 +26,10 @@ In this first exercise we'll be adding a rule to move traffic through a virtual 
     
 ## Virtual Machine Credentials
 
+An SSH key has been generated within the OS user account. This key needs to be impored from the OS account into the OpenStack account. 
+
+* Log into the OpenStack controller using SSH
+
 * Import the SSH keypair into OpenStack for use in accessing the deployed VMs
 ```bash
 openstack keypair create --public-key ~/.ssh/id_rsa.pub default
