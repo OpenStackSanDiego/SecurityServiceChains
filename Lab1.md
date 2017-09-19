@@ -153,7 +153,7 @@ EOF
 
 ## Service Chaining
 
-* Log into the physical OpenStack controller via SSH (IP address provided on the lab handout). The OpenStack credentials (keystonerc) will be loaded automatically when you login.
+* These next commands have to be done from the command line on the controller.
 
 * Create the Flow Classifier for HTTP (tcp port 80) traffic from the WebClient to the WebServer.
 ```bash
