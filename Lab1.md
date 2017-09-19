@@ -16,6 +16,7 @@ In this first exercise we'll be adding a rule to move traffic through a virtual 
   * Use the credentials and lab information provided on the lab handout
   * Your OS (SSH) and Horizon login will be in the form of userN with N being a one or two digit number
   * The userN login will be used for the physical OpenStack controller and Horizon login
+  * SSH client (i.e. PuTTY or Secure Shell plugin for Chrome)
 
 # Lab Steps
 
