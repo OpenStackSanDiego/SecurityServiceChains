@@ -18,8 +18,7 @@ In this exercise we'll be building a more complex service chain sending traffic 
 ## Log into Horizon and OpenStack Controller
   * User the credentials and lab information provided on the lab handout
   * Your OS (SSH) and Horizon login will be in the form of userNN with NN being a two digit number (including leading zero)
-  * The userNN login will be used for the physical OpenStack controller and Horizon login
-  * Virtual machine logins will generic login account details below
+  * The userN login will be used for the physical OpenStack controller and Horizon login
 
 ## Networking Setup
 
