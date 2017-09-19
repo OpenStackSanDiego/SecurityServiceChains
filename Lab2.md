@@ -22,6 +22,9 @@ In this exercise we'll be building a more complex service chain sending traffic 
   * Virtual machine logins will generic login account details below
 
 ## Networking Setup
+
+There's no need to run this command if the security groups are already setup from lab 1. Rerunning the commands will result in a warning if the security groups are already in place but won't cause any harm.
+
   * Setup network security groups to allow SSH and HTTP to the project from your laptop external network
 ```bash
 openstack security group rule create --dst-port 80 --protocol tcp --ingress default
