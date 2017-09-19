@@ -1,0 +1,65 @@
+description: Security Service Chain Lab 3
+heat_template_version: '2017-09-01'
+outputs: null
+parameters: null
+resources:
+  iot1:
+    properties:
+      flavor: m1.small
+      image: IoT-malicious
+      name: iot1
+      networks:
+      - port: {get_resource: port-iot1}
+    type: OS::Nova::Server
+  iot2:
+    properties:
+      flavor: m1.small
+      image: IoT-malicious
+      name: iot2
+      networks:
+      - port: {get_resource: port-iot2}
+    type: OS::Nova::Server
+  netmon1:
+    properties:
+      flavor: m1.small
+      image: cirros
+      name: netmon1
+      networks:
+      - port: {get_resource: port-admin1}
+      - port: {get_resource: port-ingress1}
+      - port: {get_resource: port-egress1}
+    type: OS::Nova::Server
+  netmon2:
+    properties:
+      flavor: m1.small
+      image: cirros
+      name: netmon2
+      networks:
+      - port: {get_resource: port-admin2}
+      - port: {get_resource: port-ingress2}
+      - port: {get_resource: port-egress2}
+    type: OS::Nova::Server
+  port-admin1:
+    properties: {network_id: internal}
+    type: OS::Neutron::Port
+  port-admin2:
+    properties: {network_id: internal}
+    type: OS::Neutron::Port
+  port-egress1:
+    properties: {network_id: internal}
+    type: OS::Neutron::Port
+  port-egress2:
+    properties: {network_id: internal}
+    type: OS::Neutron::Port
+  port-ingress1:
+    properties: {network_id: internal}
+    type: OS::Neutron::Port
+  port-ingress2:
+    properties: {network_id: internal}
+    type: OS::Neutron::Port
+  port-iot1:
+    properties: {network_id: internal}
+    type: OS::Neutron::Port
+  port-iot2:
+    properties: {network_id: internal}
+    type: OS::Neutron::Port
