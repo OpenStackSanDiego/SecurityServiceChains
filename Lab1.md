@@ -176,7 +176,11 @@ openstack sfc port chain create --port-pair-group Netmon-PairGroup --flow-classi
 
 ## Monitoring with TCPDump
 
-* Monitor Traffic through the Netmon1 service function with TCPDump
+From the NetMon1 machine, we'll monitor the traffic going through the service chain.
+
+* Startup a <bold>new</bold> SSH session to the controller
+
+* Use this new session to run TCPDump from netmon1
 ```bash
 ssh centos@${NETMON1_ADMIN_IP}
 sudo tcpdump -i eth1 port 80
@@ -200,6 +204,10 @@ ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 In this scenario, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was routed from eth1 to eth2 by the kernel (via ipforwarding).
 
 ## Monitoring with Snort
+
+Replace the TCPDump monitor with a new Snort monitor in IDS mode
+
+* Shutdown the TCPDump monitor session started above
 
 * Monitor Traffic through the Netmon1 service function with Snort
 ```bash
