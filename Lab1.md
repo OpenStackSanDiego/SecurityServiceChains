@@ -222,7 +222,7 @@ ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 
 * Verify that the Netmon1 service function saw the traffic via snort
 
-In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was routed from eth1 to eth2 by the kernel (via ipforwarding).
+In this scenario, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was routed from eth1 to eth2 by the kernel (via ipforwarding).
 
 
 
@@ -248,7 +248,7 @@ ssh cirros@${WEBCLIENT_IP} curl -s $WEBSERVER_IP
 
 * Verify that the Netmon1 service function saw and blocked the traffic via snort
 
-In this scenarion, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was passed through the snort process which utilized eth1 and eth2 as the ingress and egress interfaces.
+In this scenario, traffic traversed through the service function via the service chain. Within the Netmon1 service function, the traffic was passed through the snort process which utilized eth1 and eth2 as the ingress and egress interfaces.
 
 ## Tear down the lab
 
