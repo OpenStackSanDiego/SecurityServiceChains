@@ -4,14 +4,13 @@ terraform {
 }
 
 resource "packet_device" "controller" {
-#  count = "${var.server_count}"
+  count = "${var.server_count}"
 
   hostname = "${format("ewr%03d", count.index + 1)}"
 
   plan = "baremetal_1"
   facility = "ewr1"
   operating_system = "centos_7"
-#  operating_system = "ubuntu_14_04"
   billing_cycle = "hourly"
   project_id = "${var.packet_project_id}"
 
@@ -24,14 +23,14 @@ resource "packet_device" "controller" {
   }
   
   provisioner "file" {
-    source      = "install_openstack.sh"
-    destination = "/tmp/install_openstack.sh"
+    source      = "../setup.sh"
+    destination = "/tmp/setup.sh"
   }
 
   provisioner "remote-exec" {
        inline = [
-        "chmod +x /tmp/install_openstack.sh",
-        "/tmp/install_openstack.sh",
+        "chmod +x /tmp/setup.sh",
+        "/tmp/setup.sh",
        ]
   }
 }
