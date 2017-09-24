@@ -13,7 +13,7 @@ resource "packet_device" "controller" {
   operating_system = "centos_7"
   billing_cycle = "hourly"
   project_id = "${var.packet_project_id}"
-  public_ipv4_subnet_size = "/29"
+  public_ipv4_subnet_size = "29"
 
   connection {
         type = "ssh"

@@ -20,7 +20,7 @@ curl --silent					\
               "locked": false,
               "tags": [""],
               "public_ipv4_subnet_size": 29,
-              "userdata": "#cloud-config\n---\nruncmd:\n  - [ wget, \"https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/setup.sh\", -O, /tmp/setup.sh ] \n  - [ sh, -xc, /tmp/setup.sh ]"
+              "userdata": "#cloud-config\n---\nruncmd:\n  - [ wget, \"https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/setup.sh\", -O, /tmp/setup.sh ] \n  - [ chmod, 744, /tmp/setup.sh ] \n  - [ sh, -xc, /tmp/setup.sh ]"
             }
 ' "https://api.packet.net/projects/$PROJECT_ID/devices"
 
