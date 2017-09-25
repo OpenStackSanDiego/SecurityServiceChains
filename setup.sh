@@ -1,5 +1,5 @@
 yum -y update
-yum install -y https://www.rdoproject.org/repos/rdo-release.rpm
+yum install -y http://www.rdoproject.org/repos/rdo-release.rpm
 yum install -y openstack-packstack
 yum -y update
 
