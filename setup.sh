@@ -15,8 +15,6 @@ fi
 yum install -y openstack-packstack
 yum -y update
 
-exit
-
 time packstack                                  \
         --allinone                              \
         --os-cinder-install=n                   \
