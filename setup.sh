@@ -1,6 +1,6 @@
 exit
 
-yum install -y centos-release-openstack-pike
+yum install -y centos-release-openstack-ocata
 yum update -y
 yum install -y openstack-packstack
 
