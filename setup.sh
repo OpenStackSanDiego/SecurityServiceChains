@@ -1,5 +1,17 @@
 yum -y update
 yum install -y http://www.rdoproject.org/repos/rdo-release.rpm
+if [ "$?" -ne 0 ]; then
+  sleep 10
+  yum install -y http://www.rdoproject.org/repos/rdo-release.rpm
+  if [ "$?" -ne 0 ]; then
+    sleep 10
+    yum install -y http://www.rdoproject.org/repos/rdo-release.rpm
+  else
+    echo "unable to update RDO RPM"
+    exit
+  fi
+fi
+
 yum install -y openstack-packstack
 yum -y update
 
