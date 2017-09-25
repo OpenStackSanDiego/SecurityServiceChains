@@ -3,7 +3,8 @@ yum install -y https://www.rdoproject.org/repos/rdo-release.rpm
 yum install -y openstack-packstack
 yum -y update
 
-yum -y update
+exit
+
 time packstack                                  \
         --allinone                              \
         --os-cinder-install=n                   \
@@ -12,21 +13,16 @@ time packstack                                  \
         --os-heat-install=y
 
 yum -y update
+echo "*** End of base OpenStack cloud install"
 
-# fix for https://bugs.launchpad.net/horizon/+bug/1671084 (heat topology tab not present in horizon)
-sed -i 's/resources:index/resource:index/g' /usr/share/openstack-dashboard/openstack_dashboard/dashboards/project/stacks/tabs.py
-
-## end of base OpenStack cloud install
 
 # easy modification of .ini configuration files
 yum install -y crudini
 
 
-
 # install the port security extension so that port security can be turned on/off per network/por
 # service chaining requires port security turned off
 crudini --set --list /etc/neutron/plugins/ml2/ml2_conf.ini ml2 extension_drivers port_security
-
 
 
 ## install and configure networing-sfc
