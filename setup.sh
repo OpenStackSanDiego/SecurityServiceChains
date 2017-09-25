@@ -1,3 +1,5 @@
+exit
+
 yum -y update
 yum install -y http://www.rdoproject.org/repos/rdo-release.rpm
 if [ "$?" -ne 0 ]; then
