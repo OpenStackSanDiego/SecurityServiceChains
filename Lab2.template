@@ -1,5 +1,5 @@
 description: Security Service Chain Lab 2
-heat_template_version: '2017-09-01'
+heat_template_version: ocata
 outputs: null
 parameters: null
 resources:
