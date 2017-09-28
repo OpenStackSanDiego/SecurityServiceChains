@@ -5,7 +5,7 @@ fi
 
 source ~/keystonerc_admin
 
-for i in 16;
+for i in 16 17;
 do
 
 PROJECT=project$i
