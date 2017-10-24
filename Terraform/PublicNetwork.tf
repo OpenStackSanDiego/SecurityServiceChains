@@ -15,7 +15,7 @@ resource "null_resource" "public_network" {
 
   provisioner "remote-exec" {
     inline = [
-      "bash PublicNetwork.sh > PublicNetwork.out",
+      "bash PublicNetwork.sh"
     ]
   }
 }

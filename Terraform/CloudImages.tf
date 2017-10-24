@@ -9,13 +9,24 @@ resource "null_resource" "cloud_images" {
   }
 
   provisioner "file" {
+    source      = "WaitForGlance.sh"
+    destination = "WaitForGlance.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "bash WaitForGlance.sh"
+    ]
+  }
+
+  provisioner "file" {
     source      = "CloudImages.sh"
     destination = "CloudImages.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "bash CloudImages.sh > CloudImages.out",
+      "bash CloudImages.sh",
     ]
   }
 }

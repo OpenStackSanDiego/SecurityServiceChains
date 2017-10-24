@@ -34,6 +34,11 @@ resource "null_resource" "physical_network" {
     command = "until ping -c1 ${element(packet_device.controller.*.access_public_ipv4, count.index)} &>/dev/null; do :; done"
   }
 
+  # wait for SSH restart
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+
   provisioner "file" {
     source      = "WaitForOpenStackServices.sh"
     destination = "WaitForOpenStackServices.sh"

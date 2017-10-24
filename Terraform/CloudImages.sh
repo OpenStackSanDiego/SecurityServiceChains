@@ -1,4 +1,4 @@
-. ~/keystonerc_admin
+source keystonerc_admin
 
 # install some OS images
 IMG_URL=http://shell.openstacksandiego.us/Images/NetMon.img

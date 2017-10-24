@@ -1,4 +1,4 @@
-. ~/keystonerc_admin
+source keystonerc_admin
 
 # disconnect the demo router from the existing external public network
 ROUTER_ID=`openstack router show router1 -c id -f value`
