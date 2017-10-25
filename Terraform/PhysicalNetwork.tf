@@ -30,7 +30,7 @@ resource "null_resource" "physical_network" {
 
   # wait until port 22 (SSH) comes back online
   provisioner "local-exec" {
-    command = "until nc -vzw 22 ${element(packet_device.controller.*.access_public_ipv4, count.index)} 22; do sleep 2; done"
+    command = "until nc -vzw 5 ${element(packet_device.controller.*.access_public_ipv4, count.index)} 22 2> /dev/null; do sleep 2; done"
   }
 
   provisioner "file" {
