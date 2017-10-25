@@ -4,7 +4,6 @@ resource "null_resource" "physical_network" {
   depends_on = [ "null_resource.openstack",
                  "null_resource.cloud_images",
                  "null_resource.public_network",
-                 "null_resource.server_alias",
                  "null_resource.service_chain" ]
 
   connection {
@@ -26,17 +25,12 @@ resource "null_resource" "physical_network" {
 
   # wait for reboot
   provisioner "local-exec" {
-    command = "sleep 90"
-  }
-
-  # wait until it comes back online
-  provisioner "local-exec" {
-    command = "until ping -c1 ${element(packet_device.controller.*.access_public_ipv4, count.index)} &>/dev/null; do :; done"
-  }
-
-  # wait for SSH restart
-  provisioner "local-exec" {
     command = "sleep 60"
+  }
+
+  # wait until port 22 (SSH) comes back online
+  provisioner "local-exec" {
+    command = "until nc -vzw 22 ${element(packet_device.controller.*.access_public_ipv4, count.index)} 22; do sleep 2; done"
   }
 
   provisioner "file" {

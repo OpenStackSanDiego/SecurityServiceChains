@@ -19,6 +19,18 @@ resource "null_resource" "openstack" {
     ]
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "sed -i \"/\\#\\# Server aliases/a \\ \\ ServerAlias ${element(dnsimple_record.dns.*.name,count.index)}.${element(dnsimple_record.dns.*.domain,count.index)}\" /etc/httpd/conf.d/15-horizon_vhost.conf",
+      "systemctl restart httpd.service",
+    ]
+  }
+
+  # wait until port 22 (SSH) comes back online
+  provisioner "local-exec" {
+    command = "until nc -vzw 22 ${element(packet_device.controller.*.access_public_ipv4, count.index)} 22; do sleep 2; done"
+  }
+
   provisioner "file" {
     source      = "WaitForOpenStackServices.sh"
     destination = "WaitForOpenStackServices.sh"
