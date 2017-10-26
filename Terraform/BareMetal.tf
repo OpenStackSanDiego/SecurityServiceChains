@@ -3,7 +3,7 @@ provider "packet" {
 }
 
 resource "packet_device" "controller" {
-  hostname = "${format("lab%02d", count.index)}"
+  hostname = "${format("lab%d", count.index)}"
 
   count = "${var.openstack_controller_count}"
 
