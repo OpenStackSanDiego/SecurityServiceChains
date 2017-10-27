@@ -18,7 +18,7 @@ resource "dnsimple_record" "dns" {
   count = "${var.openstack_controller_count}"
 
   domain = "openstacksandiego.us"
-  name   = "${format("lab%02d.chains", count.index)}"
+  name   = "${format("lab%d.chains", count.index)}"
   value  = "${element(packet_device.controller.*.access_public_ipv4, count.index)}"
   type   = "A"
   ttl    = 3600
