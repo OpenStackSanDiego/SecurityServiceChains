@@ -30,7 +30,12 @@ resource "null_resource" "physical_network" {
 
   # wait until port 22 (SSH) comes back online
   provisioner "local-exec" {
-    command = "until nc -vzw 5 ${element(packet_device.controller.*.access_public_ipv4, count.index)} 22 2> /dev/null; do sleep 2; done"
+    command = "until nc -vzw 5 ${element(packet_device.controller.*.access_public_ipv4, count.index)} 22 2> /dev/null; do sleep 60 ; echo 'waiting for SSH port post reboot'; done"
+  }
+
+  # wait for OpenStack services which take longer than SSH to restart
+  provisioner "local-exec" {
+    command = "sleep 30"
   }
 
   provisioner "file" {
