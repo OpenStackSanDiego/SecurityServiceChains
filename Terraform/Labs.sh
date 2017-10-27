@@ -46,8 +46,10 @@ cat >> $USER_HOME/.bash_profile << EOF
 
 EOF
 
-# copy over the answers
+# copy over files for attendees to use
 wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab1-Answers.sh -O $USER_HOME/Lab1-Answers.sh
+wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab0-create.sh -O $USER_HOME/Lab0-create.sh
+wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab0-delete -O $USER_HOME/Lab0-delete
 
 
 PROJECT_ID=`openstack project create $PROJECT -f value -c id`
