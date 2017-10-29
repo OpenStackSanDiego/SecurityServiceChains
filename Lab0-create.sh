@@ -10,15 +10,6 @@ done
 
 # Instances
 openstack server create \
-	--image NetMon \
-	--flavor m1.small \
-	--nic port-id=port-admin1 \
-	--nic port-id=port-ingress1 \
-	--nic port-id=port-egress1 \
-	--key-name lab0 \
-	netmon1
-        
-openstack server create \
 	--image cirros \
 	--flavor m1.tiny \
 	--nic port-id=port-webclient \
@@ -31,6 +22,17 @@ openstack server create \
         --nic port-id=port-webserver \
 	--key-name lab0 \
 	webserver
+
+openstack server create \
+	--image NetMon \
+	--flavor m1.small \
+	--nic port-id=port-admin1 \
+	--nic port-id=port-ingress1 \
+	--nic port-id=port-egress1 \
+	--key-name lab0 \
+        --wait \
+	netmon1
+        
 
 # Save IP Address Assignments
 export WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | \
