@@ -24,7 +24,7 @@ No login credentials are provided for the IoT box. You should consider it a blac
   * Virtual machine logins will generic login account details below
 
 ## Networking Setup
-  * Setup network security groups to allow SSH and HTTP to the project from your laptop external network
+  * Setup network security groups to allow SSH and HTTP to the project from your laptop/controller to the virtual networks
 ```bash
 openstack security group rule create --dst-port 80 --protocol tcp --ingress default
 openstack security group rule create --dst-port 22 --protocol tcp --ingress default
@@ -36,19 +36,18 @@ openstack security group rule create --dst-port 22 --protocol tcp --ingress defa
 
 Startup the following ports and images using Horizon or the OpenStack CLI.
 
-| Instance Name | Image           | Flavor  | Ports                                        | 
-| ------------- |:---------------:| -------:|---------------------------------------------:|
+| Instance Name | Image           | Flavor   | Ports                                        | 
+| ------------- |:---------------:| --------:|---------------------------------------------:|
 | iot1          | IoT-malicious   | m1.small | port-iot1                                    |
-| iot2          | IoT-malicious   | m1.small | port-iot2                                    |
-| netmon1       | NetMon          | m1.small| port-admin1, port-ingress1, port-egress1     |
-| netmon2       | NetMon          | m1.small| port-admin2, port-ingress2, port-egress2     |
+| netmon1       | NetMon          | m1.small | port-admin1, port-ingress1, port-egress1     |
+| netmon2       | NetMon          | m1.small | port-admin2, port-ingress2, port-egress2     |
 
 All ports should be on the internal network.
 
-## Create a flow classifier to monitor all traffic
-* Create a flow classifier that monitors all traffic
+## Create a flow classifier to monitor
+* Create a flow classifier that monitors from an iot instance
 * Hint: removing "--destination-port" from a flow classifier will cover all ports
-* Hint: 0.0.0.0/0 can be used as a wildcard IP address
+* Hint: 0.0.0.0/0 can be used as a wildcard IP address for the destination
 * Utilize NetMon virtual machine(s) to monitor the traffic
 
 ## Create a chain to netmon1

@@ -28,11 +28,15 @@ In this demo, a chain is setup to monitor traffic between a web client and a web
     
 ## Setup the Lab
 
+Spin up all the virtual machines (web client, web server, and security function VMs), setup the L2 ports, and setup the chains.
+
 ```bash
 bash Lab0-create.sh
 ```
 
 ## Verify Functionality
+
+As part of the setup, the web client hits the web server, through the chain, every 10 seconds. This can be verified on the following screen.
 
 * Verify that the web client is hitting the webserver
 
@@ -42,12 +46,17 @@ ctrl-A ctrl-D
 ```
 
 * Verify that the NetMon instance is seeing data via tcpdump
+
+As part of the setup, a virtualized security function (tcpdump) is monitoring the traffic as the chain sends it through. This can be verified on the following screen.
+
 ```bash
 screen -r tcpdump
 ctrl-A ctrl-D
 ```
 
 ## Verify Setup
+
+Take a look at the virtual machines and layer 2 & 3 networking to visualize the setup.
 
 * Via the OpenStack dashboard examine the following pages:
 * Project->Compute->Instances
@@ -56,12 +65,17 @@ ctrl-A ctrl-D
 
 ## Verify Service Function Chain components
 
+Examine the flow classifier to see what traffic is sent through the chain.
+
 * Examine the Flow Classifier
 ```bash
 openstack sfc flow classifier list
 ```
 
 * Examine the Port Chains, Groups and Pair
+
+Examine the port pairs/groups/chains to see how the traffic is chained.
+
 ```bash
 openstack sfc port chain list
 openstack sfc port pair group list
@@ -69,6 +83,8 @@ openstack sfc port pair list
 ```
 
 ## Tear down the Lab
+
+Tear down the lab so the environment is ready for the next lab.
 
 ```bash
 bash Lab0-delete.sh
