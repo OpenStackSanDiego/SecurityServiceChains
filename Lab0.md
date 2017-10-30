@@ -34,6 +34,12 @@ Spin up all the virtual machines (web client, web server, and security function 
 bash Lab0-create.sh
 ```
 
+List the screens that have been started up as part of the lab.
+
+```bash
+screen -ls
+```
+
 ## Verify Functionality
 
 As part of the setup, the web client hits the web server, through the chain, every 10 seconds. This can be verified on the following screen.
