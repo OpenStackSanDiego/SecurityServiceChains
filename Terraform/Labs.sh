@@ -49,7 +49,7 @@ EOF
 # copy over files for attendees to use
 wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab1-Answers.sh -O $USER_HOME/Lab1-Answers.sh
 wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab0-create.sh -O $USER_HOME/Lab0-create.sh
-wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab0-delete -O $USER_HOME/Lab0-delete
+wget https://raw.githubusercontent.com/OpenStackSanDiego/SecurityServiceChains/master/Lab0-delete.sh -O $USER_HOME/Lab0-delete.sh
 
 
 PROJECT_ID=`openstack project create $PROJECT -f value -c id`
