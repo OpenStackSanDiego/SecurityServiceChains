@@ -1,5 +1,5 @@
 
-# Lab 0 - Prebuild Lab
+# Lab 0 - Prebuilt Lab
 
 # Overview
 
@@ -94,6 +94,12 @@ Tear down the lab so the environment is ready for the next lab.
 
 ```bash
 bash Lab0-delete.sh
+```
+
+Delete any of the save virtual machine keys.
+
+```bash
+rm ~/.ssh/known_hosts
 ```
 
 
