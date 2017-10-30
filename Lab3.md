@@ -59,7 +59,7 @@ All ports should be on the internal network.
 
 ## Block the malicious traffic
 * Update the flow classifier to only catch the malicious traffic by port
-* Update the snort rules to block the traffic "/etc/snort/rules/snort-ips.rules"
+* Update the snort rules to block the traffic "/etc/snort/local-ips.rules"
 * Disable IP forwarding on netmon1 before starting snort-ips
 * Startup snort-ips and verify traffic is being dropped
 * Run tcpdump on the egress port to validate traffic is being dropped
