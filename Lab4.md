@@ -67,9 +67,17 @@ service nginx start
 
 * Setup the routing through the virtual machine
 ```bash
-sudo ip route add ${WEBCLIENT_IP} dev eth1
-sudo ip route add ${WEBSERVER_IP} dev eth2
+ip route add ${WEBCLIENT_IP} dev eth1
+ip route add ${WEBSERVER_IP} dev eth2
 ```
+
+* Setup iptables
+
+```bash
+yum install iptables-services
+yum service iptables restart
+```
+
 
 * Setup iptables rules to rewrite inbound traffic to web server
 
