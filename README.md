@@ -6,7 +6,7 @@ This workshop will teach you how to use network rule chains to push traffic thro
 
 To learn a little more about this workshop, how it came about, why it makes sense to run layer 2 service chains and how the lab is configured, please read:
 
-* [About this Workshop](../blob/master/AboutThisWorkshop.md)
+* [About this Workshop](../master/AboutThisWorkshop.md)
 
 ## Cloud Assignments
 
