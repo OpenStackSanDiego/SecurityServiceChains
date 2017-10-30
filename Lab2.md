@@ -51,7 +51,7 @@ Create six ports to be used for the monitoring. These will be the inbound and ou
 
 ## Instances
 
-Startup the following five images. This can be done via Horizon or the OpenStack CLI. See Lab #1 for the CLI syntax.
+Startup the following four images. This can be done via Horizon or the OpenStack CLI. See Lab #1 for the CLI syntax.
 
 | Instance Name | Image         | Flavor  | Ports                                        | 
 | ------------- |:-------------:| -------:|---------------------------------------------:|
