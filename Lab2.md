@@ -3,12 +3,14 @@
 
 # Overview
 
-In this exercise we'll be building a more complex service chain sending traffic through two service functions chained together. This includes setting up the service chain and the virtual security functions. 
+In this exercise we'll be building a more complex service chain sending traffic through two service functions chained together in a redundant configuration. This will include two tcpdump instances (in a redundant pair) and two Snort instances (in a redundant pair). This involves setting up the service chain and the virtual security functions. 
 
 
 # Goals
 
-  * Build two virtual security function in virtual machines
+  * Build two virtual security function (tcpdump/snort) in redundant virtual machines
+  * Group together multiple port pairs for redundancy
+  * Chain traffic through multiple port pair groups
   * Setup a service chain incorporating both virtual security functions
   * Monitor inbound web (HTTP) traffic from the client to web server
   * Block inbound web (HTTP) traffic from the client to the web server
@@ -33,16 +35,14 @@ openstack security group rule create --dst-port 22 --protocol tcp --ingress defa
 # Lab Steps
 ## Network Monitoring Ports
 
-Create six ports to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machines. Create ports for the web client and web server virtual machines. See Lab #1 for the CLI syntax. Hint: openstack port create --network internal port-name....
+Create eight ports to be used for the monitoring. These will be the inbound and outbound traffic ports for the network monitoring virtual machines. Create ports for the web client and web server virtual machines. See Lab #1 for the CLI syntax. Hint: openstack port create --network internal port-name....
+
 
 | Port              | Network       | Purpose                             |
 | ------------------|:--------------|:------------------------------------|
-| port-ingress1     | internal      | service function 1 traffic ingress  |
-| port-egress1      | internal      | service function 1 traffic egress   |
-| port-admin1       | internal      | service function 1 management       |
-| port-ingress2     | internal      | service function 2 traffic ingress  |
-| port-egress2      | internal      | service function 2 traffic egress   |
-| port-admin2       | internal      | service function 2 management       |
+| port-ingress{1-4}     | internal      | service function traffic ingress  |
+| port-egress{1-4}      | internal      | service function traffic egress   |
+| port-admin{1-4}       | internal      | service function management       |
 | port-webclient    | internal      | traffic source                      |
 | port-webserver    | internal      | traffic consumer                    |
 
@@ -57,32 +57,12 @@ Startup the following four images. This can be done via Horizon or the OpenStack
 | ------------- |:-------------:| -------:|---------------------------------------------:|
 | webclient     | cirros        | m1.tiny | port-webclient                               |
 | webserver     | cirros        | m1.tiny | port-webserver                               |
-| netmon1       | NetMon        | m1.small| port-admin1, port-ingress1, port-egress1     |
-| netmon2       | NetMon        | m1.small| port-admin2, port-ingress2, port-egress2     |
+| netmon{1-4}      | NetMon        | m1.small| port-admin{1-4}, port-ingress{1-4}, port-egress{1-4}     |
+
 
 ## Save IP Address Assignments
 
-For simplicity sake, save the IP addresses assigned to each port to a shell variable to be used later in the lab.
-
-* Save the assigned IP addresses to shell variables
-```bash
-WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | \
-	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo WEBCLIENT_IP=$WEBCLIENT_IP
-
-WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | \
-	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo WEBSERVER_IP=$WEBSERVER_IP
-
-NETMON1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | \
-	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo NETMON1_ADMIN_IP=$NETMON1_ADMIN_IP
-
-
-NETMON2_ADMIN_IP=$(openstack port show port-admin2 -f value -c fixed_ips | \
-	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
-echo NETMON2_ADMIN_IP=$NETMON2_ADMIN_IP
-```
+For simplicity sake, save the IP addresses assigned to each port to a shell variable to be used later in the lab. See the previous lab for examples.
 
 ## Startup the Web Server
 
@@ -90,13 +70,13 @@ We'll startup a small web server that simply responds back with a hostname strin
 
 ## IP Forwarding and Routing Setup
 
-* Setup routes to/from webclient and webserver on netmon1 and netmon2
+* Setup routes to/from webclient and webserver across all the netmon instances.
 
-See Lab #1 for the CLI syntax. Be sure to turn on IP Forwarding and setup the routes on both virtual machines netmon1 and netmon2.
+See Lab #1 for the CLI syntax. Be sure to turn on IP Forwarding and setup the routes on all netmon instances.
 
 ## Service Chaining
 
-Create a new service chain that sends HTTP traffic from the web client to the web server through both netmon1 and netmon2.
+Create a new service chain that sends HTTP traffic from the web client to the web server through all the netmon instances.
 
 * Create the Flow Classifier for HTTP (tcp port 80) traffic from the WebClient to the WebServer.
 ```bash
@@ -110,18 +90,18 @@ openstack sfc flow classifier create \
     FC-WebServer-HTTP
 ```
 
-* Create the Port Pair, Port Pair Group, and Port Chain
-```bash
-openstack sfc port pair create --ingress=port-ingress1 --egress=port-egress1 Netmon1-PortPair
-openstack sfc port pair create --ingress=port-ingress2 --egress=port-egress2 Netmon2-PortPair
-openstack sfc port pair group create --port-pair Netmon1-PortPair Netmon1-PairGroup
-openstack sfc port pair group create --port-pair Netmon2-PortPair Netmon2-PairGroup
-openstack sfc port chain create --port-pair-group Netmon1-PairGroup --port-pair-group Netmon2-PairGroup --flow-classifier FC-WebServer-HTTP PC1
-```
+Netmon{1,2} will run tcpdump in a set of two redundant instances.
+Netmon{3,4} will run Snort (IDS) in a set of two redunant instances.
+
+* Create the Port Pairs (4 in total)
+* Create the Port Pair Groups (2 in total)
+* Create the Port Chain (1)
 
 ## Enable Monitoring/IDS Functions
 
-See Lab #1 for the commands to startup TCPDump or Snort.  Startup either TCPDump or Snort IDS (not IPS) on each of netmon1 and netmon2. Only run one function on each monitor.
+See Lab #1 for the commands to startup TCPDump or Snort.
+
+Startup TCPDump on netmon{1,2} and Snort IDS (not IPS) on netmon{3,4} Only run one function on each monitor.
 
 * Monitor traffic through the netmon1 service function with TCPDump or Snort IDS
 * Monitor traffic through the netmon2 service function with TCPDump or Snort IDS
@@ -138,6 +118,6 @@ From the WebClient, we'll hit the WebServer, using curl, to generate traffic thr
 
 ## Tear down the lab
 
-* Delete the webclient, webserver, netmon1 and netmon2 virtual machines
+* Delete the webclient, webserver, and netmon virtual machines
 * Delete the service chain components
 * Delete the network ports
