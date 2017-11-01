@@ -5,7 +5,12 @@ fi
 
 source ~/keystonerc_admin
 
-for i in 16 17;
+ROUTER_ID=`openstack router create --project admin router -f value -c id`
+
+PUBLIC_NETWORK_ID=`openstack network show public -f value -c id`
+openstack router set --external-gateway $PUBLIC_NETWORK_ID $ROUTER_ID
+
+for i in 16 20;
 do
 
 PROJECT=project$i
@@ -76,13 +81,15 @@ SUBNET_ID=`openstack subnet create              \
 # port security needs to be off for service chains
 openstack network set --disable-port-security $NETWORK_ID
 
-ROUTER_ID=`openstack router create --project $PROJECT_ID router$i -f value -c id`
 openstack router add subnet $ROUTER_ID $SUBNET_ID
 
-PUBLIC_NETWORK_ID=`openstack network show public -f value -c id`
-openstack router set --external-gateway $PUBLIC_NETWORK_ID $ROUTER_ID
+done
+
+sed -i 's/^PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+systemctl restart sshd.service
 
 # setup route from physical server to this subnet
+sleep 2
 NET_GATEWAY=$(sudo ip netns exec qrouter-"${ROUTER_ID}" ip -4 route get 8.8.8.8 | head -n1 | awk '{print $7}')
 if [ "${NET_GATEWAY}" = "" ]; then
   echo "waiting for network..."
@@ -95,9 +102,3 @@ if [ "${NET_GATEWAY}" = "" ]; then
   NET_GATEWAY=$(sudo ip netns exec qrouter-"${ROUTER_ID}" ip -4 route get 8.8.8.8 | head -n1 | awk '{print $7}')
 fi
 ip route replace "${INTERNAL_SUBNET}" via $NET_GATEWAY
-
-done
-
-sed -i 's/^PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-systemctl restart sshd.service
-
