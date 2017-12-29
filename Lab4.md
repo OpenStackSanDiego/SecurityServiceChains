@@ -3,12 +3,14 @@
 
 # Overview
 
-Web Application Firewalls, WAFs, provider layer 7 monitoring and blocking of web traffic. A web proxy, such as nginx, can be configured to run as a WAF. In this lab, nginx will be installed and configured as a virtual security function as part of a service chain. 
+Web Application Firewalls, WAFs, provide layer 7 monitoring and can manage web traffic. A web proxy, such as Apache with [Mod Security](https://www.modsecurity.org/), can be configured as a WAF. In this lab, a WAF will be installed and configured as a virtual security function as part of a service chain.
 
 # Goals
 
-  * Virtualize nginx for use in a SFC
-  * Create a SFC that uses the new VM
+  * Deploy a mod security based virtual machine
+  * Configure that virtual machine to properly route packets through the WAF
+  * Configure a service chain to use the WAF
+  * Validate that the WAF is inline of the chain and can either alert or block malicious web traffic
 
 # Prereq
 
@@ -29,76 +31,86 @@ openstack security group rule create --dst-port 22 --protocol tcp --ingress defa
 
 ## Ports and Instances
 
-Create enough ports to have two virtual security functions (tcpdump/snort and nginx) as well as a webclient and a webserver. Refer back to lab 2 for details on this setup as needed.
+Startup the following ports and images using Horizon or the OpenStack CLI.
 
-Utilizing the NetMon baseline, install and configure nginx as an additional function. 
+| Port              | Network       | Purpose                             |
+| ------------------|:--------------|:------------------------------------|
+| port-ingress1     | internal      | service function traffic ingress    |
+| port-egress1      | internal      | service function traffic egress     |
+| port-admin1       | internal      | service function management         |
+| port-webclient    | internal      | traffic source                      |
+| port-webserver    | internal      | traffic consumer                    |
 
-All ports should be on the internal network.
+## Instances
 
-## Create the virtual security function
+Startup the following instances. This can be done via Horizon or the OpenStack CLI. See Lab #1 for the CLI syntax.
 
-Within the virtual instance, install and configure nginx to handle traffic delivered via the service chain.
+| Instance Name | Image         | Flavor  | Ports                                        |
+| ------------- |:-------------:| -------:|---------------------------------------------:|
+| webclient     | cirros        | m1.tiny | port-webclient                               |
+| webserver     | cirros        | m1.tiny | port-webserver                               |
+| modsec1       | ModSec        | m1.small| port-admin1, port-ingress1, port-egress1     |
 
-* Disable SELinux
+## Save IP Address Assignments
 
-```bash
-sed -i /etc/selinux/config -r -e 's/^SELINUX=.*/SELINUX=disabled/g'
-yum -y install epel-release
-reboot
-```
-
-* Install nginx
-
-```bash
-yum -y install nginx
-```
-
-* Configure nginx
+For simplicity sake, save the IP addresses assigned to each port to a shell variable to be used later in the lab.
 
 ```bash
-vi /etc/nginx/nginx.conf
+WEBCLIENT_IP=$(openstack port show port-webclient -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+export WEBCLIENT_IP=$WEBCLIENT_IP
+
+WEBSERVER_IP=$(openstack port show port-webserver -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+export WEBSERVER_IP=$WEBSERVER_IP
+
+MODSEC1_ADMIN_IP=$(openstack port show port-admin1 -f value -c fixed_ips | \
+	grep "ip_address='[0-9]*\." | cut -d"'" -f2)
+export MODSEC1_ADMIN_IP=$MODSEC1_ADMIN_IP
 ```
 
-* Startup nginx
+## Configure Apache's proxy.conf
+
+ssh into the modsec1 instance and edit `/etc/httpd/conf.d/proxy.conf` changing the `WEBSERVER_IP` to be the IP address of the webserver that was created. Also uncomment the `ProxyPass` and `ProxyPassReverse` lines as well. This will allow Apache to proxy to the backend webserver.
+
+Make sure to reload Apache/httpd once the file has been edited and configured properly.
 
 ```bash
-service nginx start
+$ systemctl reload httpd
 ```
 
-* Setup the routing through the virtual machine
-```bash
-ip route add ${WEBCLIENT_IP} dev eth1
-ip route add ${WEBSERVER_IP} dev eth2
-```
+## IP Forwarding and Routing Setup
 
-* Setup iptables
+* On the ModSec instance, setup routes to/from webclient and webserver
 
-```bash
-yum install iptables-services
-yum service iptables restart
-```
+See Lab #1 for the CLI syntax. Be sure to turn on IP Forwarding and setup the routes on all netmon instances.
 
-
-* Setup iptables rules to rewrite inbound traffic to web server
-
-* Setup iptables rules to rewrite outbound traffic from web server
-
-## Create a flow classifier and service chain
-
-Refer back to the earlier labs for the syntax on creating port pairs/groups/chains and flow classifiers.
-
-* Create a flow classifier that monitors from the web client to the web server
-* Chain traffic through all the virtualized security functions
-
-## Generate traffic
-* From the web client, generate web traffic to the web server
-
-## Monitor Traffic
-* Validate that traffic through the nginx server is being monitored and logged.
+* Setup IPTables to forward traffic destined for the `WEBSERVER_IP` to the `MODSEC1_ADMIN_IP` so that the traffic will go through mod security.
 
 ```bash
-tail -f /var/log/nginx/proxy_access.log
+ssh fedora@{$MODSEC1_ADMIN_IP} \
+'sudo iptables -t nat -A PREROUTING -p tcp -d {$WEBSERVER_IP} --dport 80 -j NETMAP --to ${MODSEC1_ADMIN_IP}'
 ```
+
+## Service Chaining
+
+Create a new service chain that sends HTTP traffic from the web client to the web server through the modsec instance.
+
+## Generate traffic through Service Chain
+
+First, login to the modsec1 instance and run:
+
+```
+modsec1$ sudo tail -f modsec_audit.log
+```
+
+Fake a directory traversal attack.
+
+```bash
+ssh fedora@${WEBCLIENT_IP} curl -s ${WEBSERVER_IP}/?abc=../../
+```
+
+The attack should be logged by mod security in the audit log.
 
 ## Tear down the lab
 

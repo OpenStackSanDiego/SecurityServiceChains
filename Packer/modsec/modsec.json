@@ -1,0 +1,48 @@
+{
+  "builders": [
+    {
+      "type": "openstack",
+      "flavor": "m1.small",
+      "ssh_username": "fedora",
+      "region": "RegionOne",
+      "image_name": "ModSec",
+      "source_image": "dbde3611-246d-43d4-a9b1-1bde36584673",
+      "networks": ["3e99cfbd-8764-490a-8227-27199741cece"],
+      "use_floating_ip": false,
+      "security_groups": ["default"],
+      "ssh_keypair_name": "default",
+      "ssh_private_key_file": "/home/user16/.ssh/id_rsa",
+      "ssh_pty" : true
+    }
+  ],
+   "provisioners": [
+     {
+       "type": "file",
+       "source": "setup.sh",
+       "destination": "/tmp/setup.sh"
+     },
+     {
+       "type": "file",
+       "source": "cleanup.sh",
+       "destination": "/tmp/cleanup.sh"
+     },
+     {
+       "type": "file",
+       "source": "proxy.conf",
+       "destination": "/tmp/proxy.conf"
+     },
+     {
+       "type": "file",
+       "source": "mod_security.conf",
+       "destination": "/tmp/mod_security.conf"
+     },
+     {
+       "type": "shell",
+       "inline": ["sudo su -c '/bin/bash /tmp/setup.sh'"]
+     },
+     {
+       "type": "shell",
+       "inline": ["sudo su -c '/bin/bash /tmp/cleanup.sh'"]
+     }
+   ]
+}
